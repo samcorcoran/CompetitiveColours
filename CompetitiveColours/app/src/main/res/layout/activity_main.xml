@@ -1,7 +1,9 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="10"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
@@ -9,58 +11,68 @@
     android:id="@+id/main_layout"
     tools:context="uk.wycor.competitivecolours.app.MainActivity">
 
-    <TextView
-        android:text="@string/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/textView"
-        android:textAppearance="@android:style/TextAppearance.Large" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_make_discoverable"
-        android:id="@+id/button_make_discoverable"
-        android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:textColor="@android:color/primary_text_light" />
+        <TextView
+            android:text="@string/hello_world"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView"
+            android:textAppearance="@android:style/TextAppearance.Large" />
 
-    <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:checked="false"
-        android:textOn="@string/toggle_bluetooth_on"
-        android:textOff="@string/toggle_bluetooth_off"
-        android:layout_below="@+id/button_make_discoverable"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/toggle_bluetooth_enabled" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/button_make_discoverable"
+            android:id="@+id/button_make_discoverable"
+            android:layout_below="@+id/textView"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/primary_text_light" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_red"
-        android:id="@+id/button_red"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:checked="false"
+            android:textOn="@string/toggle_bluetooth_on"
+            android:textOff="@string/toggle_bluetooth_off"
+            android:layout_below="@+id/button_make_discoverable"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/toggle_bluetooth_enabled" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_green"
-        android:id="@+id/button_green"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:weightSum="3" >
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_blue"
-        android:id="@+id/button_blue"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentBottom="true" />
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/button_red"
+            android:id="@+id/button_red" />
 
-</RelativeLayout>
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/button_green"
+            android:id="@+id/button_green" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/button_blue"
+            android:id="@+id/button_blue" />
+    </LinearLayout>
+</LinearLayout>
