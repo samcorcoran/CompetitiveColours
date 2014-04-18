@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -28,9 +30,12 @@ public class MainActivity extends ActionBarActivity {
     private Button button_make_discoverable;
     private Button button_search_for_devices;
 
+    private int currentBackground;
+
     static final int BACKGROUND_RED = 0x1;
     static final int BACKGROUND_GREEN = 0x2;
     static final int BACKGROUND_BLUE = 0x4;
+    static final int BACKGROUND_YELLOW = 0x8;
 
     private ListView deviceList;
     private Set<BluetoothDevice> pairedDevices;
@@ -39,6 +44,7 @@ public class MainActivity extends ActionBarActivity {
     protected Button button_red;
     protected Button button_green;
     protected Button button_blue;
+    protected Button button_yellow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +64,7 @@ public class MainActivity extends ActionBarActivity {
         button_red = (Button) findViewById(R.id.button_red);
         button_green = (Button) findViewById(R.id.button_green);
         button_blue = (Button) findViewById(R.id.button_blue);
+        button_yellow = (Button) findViewById(R.id.button_yellow);
 
         button_red.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -72,6 +79,11 @@ public class MainActivity extends ActionBarActivity {
         button_blue.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 setBackgroundBlue();
+            }
+        });
+        button_yellow.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setBackgroundYellow();
             }
         });
 
@@ -204,6 +216,12 @@ public class MainActivity extends ActionBarActivity {
         this.unregisterReceiver(bluetoothReceiver);
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setBackground(currentBackground);
+    }
+
     private void updateBluetoothToggle() {
         if (ourBluetoothAdapter.isEnabled()) {
             updateBluetoothToggle(BluetoothAdapter.STATE_ON);
@@ -229,19 +247,41 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    protected void setBackgroundRed() {
+    protected void setBackground(int bg) {
+        currentBackground = bg;
         View main_view = findViewById(R.id.main_layout);
-        main_view.setBackgroundColor(getResources().getColor(R.color.background_red));
+        switch (bg) {
+            case BACKGROUND_BLUE:
+                main_view.setBackgroundColor(getResources().getColor(R.color.background_blue));
+                break;
+            case BACKGROUND_YELLOW:
+                main_view.setBackgroundColor(getResources().getColor(R.color.background_yellow));
+                break;
+            case BACKGROUND_RED:
+                main_view.setBackgroundColor(getResources().getColor(R.color.background_red));
+                break;
+            case BACKGROUND_GREEN:
+                main_view.setBackgroundColor(getResources().getColor(R.color.background_green));
+                break;
+            default:
+                main_view.setBackgroundColor(Color.parseColor("#FFFAFA"));
+        }
+    }
+
+    protected void setBackgroundRed() {
+        setBackground(BACKGROUND_RED);
     }
 
     protected void setBackgroundGreen() {
-        View main_view = findViewById(R.id.main_layout);
-        main_view.setBackgroundColor(getResources().getColor(R.color.background_green));
+        setBackground(BACKGROUND_GREEN);
     }
 
     protected void setBackgroundBlue() {
-        View main_view = findViewById(R.id.main_layout);
-        main_view.setBackgroundColor(getResources().getColor(R.color.background_blue));
+        setBackground(BACKGROUND_BLUE);
+    }
+
+    protected void setBackgroundYellow() {
+        setBackground(BACKGROUND_YELLOW);
     }
 
     public void listPairedDevices(View view){
