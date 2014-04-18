@@ -381,7 +381,7 @@ public class MainActivity extends ActionBarActivity {
                     countdownSinceSearch.cancel();
                 countdownInProgress = true;
                 final long timeoutLength = 60000;
-                countdownSinceSearch = new CountDownTimer(60000, 1000) {
+                countdownSinceSearch = new CountDownTimer(timeoutLength, 1000) {
                     public void onTick(long millisUntilFinished) {
                         long elapsed = (timeoutLength - millisUntilFinished)/1000;
                         timeSinceSearchMsg.setText("(" + elapsed + " seconds elapsed since last device search...)" );
