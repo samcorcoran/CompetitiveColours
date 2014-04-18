@@ -24,16 +24,6 @@
             android:id="@+id/textView"
             android:textAppearance="@android:style/TextAppearance.Large" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/button_make_discoverable"
-            android:id="@+id/button_make_discoverable"
-            android:layout_below="@+id/textView"
-            android:layout_centerHorizontal="true"
-            android:textColor="@android:color/primary_text_light" />
-
         <ToggleButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,6 +35,26 @@
             android:layout_below="@+id/button_make_discoverable"
             android:layout_centerHorizontal="true"
             android:id="@+id/toggle_bluetooth_enabled" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/button_make_discoverable"
+            android:id="@+id/button_make_discoverable"
+            android:layout_below="@+id/textView"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/primary_text_light" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/button_search_for_devices"
+            android:id="@+id/button_search_for_devices"
+            android:layout_below="@+id/textView"
+            android:layout_centerHorizontal="true"
+            android:textColor="@android:color/primary_text_light" />
 
     </LinearLayout>
     <LinearLayout
