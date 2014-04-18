@@ -18,16 +18,9 @@ import android.view.View;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.ListView;
-
-<<<<<<< HEAD
 import java.io.IOException;
-import java.util.Set;
 import java.util.UUID;
-=======
-import java.util.List;
-import java.util.Set;
 import java.util.Vector;
->>>>>>> 97601dd0c1f5791080f7ccedc857768121e82b79
 
 public class MainActivity extends ActionBarActivity {
 
@@ -334,7 +327,6 @@ public class MainActivity extends ActionBarActivity {
         button_search_for_devices.setEnabled(enabled);
     };
 
-<<<<<<< HEAD
     private void beginClientConnection(BluetoothDevice bluetoothDevice) {
         BluetoothSocket bluetoothSocket;
         try {
@@ -359,8 +351,4 @@ public class MainActivity extends ActionBarActivity {
         ServerThread serverThread = new ServerThread(bluetoothServerSocket);
         serverThread.start();
     }
-=======
-    private void connectToGameServer(BluetoothDevice gameServer) {
-    };
->>>>>>> 97601dd0c1f5791080f7ccedc857768121e82b79
 }
