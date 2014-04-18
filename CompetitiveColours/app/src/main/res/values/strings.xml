@@ -5,10 +5,11 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="button_make_discoverable">MAKE THIS DEVICE DISCOVERABLE!!</string>
-    <string name="button_search_for_devices">Find a game...</string>
+    <string name="button_search_for_devices">Refresh Game List</string>
     <string name="toggle_bluetooth_off">Bluetooth Disabled</string>
     <string name="toggle_bluetooth_on">Bluetooth Enabled</string>
     <string name="warning_bluetooth_unsupported">Your device does not support Bluetooth</string>
+    <string name="device_list_title">Possible hosts...</string>
     <string name="button_red">RED</string>
     <string name="button_green">GREEN</string>
     <string name="button_blue">BLUE!</string>
