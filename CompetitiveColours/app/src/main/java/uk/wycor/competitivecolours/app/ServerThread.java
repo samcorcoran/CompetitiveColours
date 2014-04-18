@@ -32,7 +32,9 @@ public class ServerThread extends Thread {
         Message m = handler.obtainMessage();
         Bundle b = m.getData();
         b.putString("key", "Background Task notify, server thread has started");
+        b.putInt(MainActivity.COLOUR_CHANGE_EVENT, MainActivity.BACKGROUND_GREEN);
         handler.sendMessage(m);
+
         while (true) {
             try {
                 socket = serverSocket.accept();
