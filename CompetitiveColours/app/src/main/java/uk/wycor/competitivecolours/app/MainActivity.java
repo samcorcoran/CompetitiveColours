@@ -94,6 +94,11 @@ public class MainActivity extends ActionBarActivity {
 
         ourBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
+        // handle 'found device' event
+        registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+        // handle 'finished searching for device' event
+        registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+
         if(ourBluetoothAdapter == null) {
             // Disable buttons
             toggle_bluetooth_enabled.setEnabled(false);
@@ -118,11 +123,11 @@ public class MainActivity extends ActionBarActivity {
                         Toast.makeText(getApplicationContext(), "Search for devices cancelled", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Toast.makeText(getApplicationContext(), "Searching for devices...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Searching for devices...", Toast.LENGTH_LONG).show();
                         BTArrayAdapter.clear();
+                        pairedDevices.clear();
                         BTArrayAdapter.notifyDataSetChanged();
                         ourBluetoothAdapter.startDiscovery();
-                        registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
                     }
                 }
             });
@@ -161,7 +166,7 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // Attempt connection to selected device
                 BluetoothDevice chosenDevice = pairedDevices.get(position);
-                //connectToGameServer(chosenDevice);
+                beginClientConnection(chosenDevice);
             }
         });
     }
@@ -310,7 +315,7 @@ public class MainActivity extends ActionBarActivity {
                         BluetoothAdapter.ERROR);
                 updateBluetoothToggle(state);
             }
-            else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            else if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Add to device list
@@ -318,6 +323,22 @@ public class MainActivity extends ActionBarActivity {
                 // add the name and the MAC address of the object to the arrayAdapter
                 BTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
                 BTArrayAdapter.notifyDataSetChanged();
+            }
+            else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
+                // Finished searching for devices
+                // Announce number of devices found
+                String msg;
+                int numDevices = pairedDevices.size();
+                if (numDevices == 0) {
+                    msg = "No devices found";
+                }
+                else {
+                    msg = Integer.toString(numDevices) + " device";
+                    if (numDevices > 1)
+                        msg += "s";
+                    msg += " found";
+                }
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
             }
         }
     };
