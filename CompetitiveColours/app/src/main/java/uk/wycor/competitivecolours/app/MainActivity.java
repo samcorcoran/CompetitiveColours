@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.os.Message;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
@@ -18,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.bluetooth.*;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.ListView;
@@ -46,6 +48,8 @@ public class MainActivity extends ActionBarActivity {
     private Button button_start_server;
     private Button button_search_for_devices;
 
+    private CountDownTimer countdownSinceSearch;
+    private boolean countdownInProgress;
     private int currentBackground;
 
     static final int BACKGROUND_RED = 0x1;
@@ -88,7 +92,6 @@ public class MainActivity extends ActionBarActivity {
         };
 
         button_start_server = (Button) findViewById(R.id.button_start_server);
-
         button_start_server.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //make a thing happen
@@ -124,6 +127,8 @@ public class MainActivity extends ActionBarActivity {
         });
 
         ourBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        countdownInProgress = false;
 
         // handle 'found device' event
         registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
@@ -264,7 +269,6 @@ public class MainActivity extends ActionBarActivity {
         updateBluetoothToggle();
     }
 
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -360,6 +364,25 @@ public class MainActivity extends ActionBarActivity {
             }
             else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)) {
                 // Finished searching for devices
+
+                // Use countdown timer to display time elapsed since last device search ended
+                final TextView timeSinceSearchMsg = (TextView) findViewById(R.id.device_list_time_elapsed);
+                if (countdownInProgress)
+                    countdownSinceSearch.cancel();
+                countdownInProgress = true;
+                final long timeoutLength = 60000;
+                countdownSinceSearch = new CountDownTimer(60000, 1000) {
+                    public void onTick(long millisUntilFinished) {
+                        long elapsed = (timeoutLength - millisUntilFinished)/1000;
+                        timeSinceSearchMsg.setText("(" + elapsed + " seconds elapsed since last device search...)" );
+                    }
+
+                    public void onFinish() {
+                        countdownInProgress = false;
+                        timeSinceSearchMsg.setText("(>1 min since last device search...)");
+                    }
+                }.start();
+
                 // Announce number of devices found
                 String msg;
                 int numDevices = pairedDevices.size();
