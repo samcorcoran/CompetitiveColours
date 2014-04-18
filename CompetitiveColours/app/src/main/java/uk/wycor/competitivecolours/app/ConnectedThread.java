@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 /**
@@ -46,17 +48,19 @@ public class ConnectedThread extends Thread {
     public void run() {
         byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes; // bytes returned from read()
-
-        // Keep listening to the InputStream until an exception occurs
-        while (true) {
-            try {
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        String line = null;
+        try {
+            while ((line = br.readLine()) != null) {
+                // Keep listening to the InputStream until an exception occurs
                 // Read from the InputStream
+                /*
                 bytes = inputStream.read(buffer);
                 // Send the obtained bytes to the UI activity
                 handler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                         .sendToTarget();
-                String message = new String(buffer);
-                String[] parts = message.split(":");
+                String message = new String(buffer);*/
+                String[] parts = line.split(":");
                 if (parts.length == 2) {
                     int newbgcolour = Integer.parseInt(parts[1]);
                     Message m = handler.obtainMessage();
@@ -65,9 +69,9 @@ public class ConnectedThread extends Thread {
                     b.putInt(MainActivity.COLOUR_CHANGE_EVENT, newbgcolour);
                     handler.sendMessage(m);
                 }
-            } catch (IOException e) {
-                break;
             }
+        } catch (IOException e) {
+
         }
     }
 
