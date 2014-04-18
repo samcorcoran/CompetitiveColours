@@ -28,13 +28,13 @@
     <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/toggle_bluetoothEnabled"
         android:layout_marginTop="30dp"
         android:checked="false"
         android:textOn="@string/toggle_bluetooth_on"
         android:textOff="@string/toggle_bluetooth_off"
         android:layout_below="@+id/button_make_discoverable"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:id="@+id/toggle_bluetooth_enabled" />
 
     <Button
         android:layout_width="wrap_content"

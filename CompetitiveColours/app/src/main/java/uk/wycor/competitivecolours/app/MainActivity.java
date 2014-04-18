@@ -9,11 +9,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.bluetooth.*;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class MainActivity extends ActionBarActivity {
 
     static final int MAKE_DISCOVERABLE_REQUEST = 1;
+    static final int REQUEST_ENABLE_BT = 2;
+
+    private BluetoothAdapter ourBluetoothAdapter;
+
+    private ToggleButton toggle_bluetooth_enabled;
+    private Button button_make_discoverable;
 
     static final int BACKGROUND_RED = 0x1;
     static final int BACKGROUND_GREEN = 0x2;
@@ -28,6 +36,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+<<<<<<< HEAD
 
         final Button button_make_discoverable = (Button) findViewById(R.id.button_make_discoverable);
         button_make_discoverable.setOnClickListener(new View.OnClickListener() {
@@ -57,6 +66,45 @@ public class MainActivity extends ActionBarActivity {
                 setBackgroundBlue();
             }
         });
+=======
+        ourBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if(ourBluetoothAdapter == null) {
+            // Disable buttons
+            toggle_bluetooth_enabled.setEnabled(false);
+            // Warn user
+            Toast.makeText(getApplicationContext(), R.string.warning_bluetooth_unsupported, Toast.LENGTH_LONG).show();
+        } else {
+            button_make_discoverable = (Button) findViewById(R.id.button_make_discoverable);
+            button_make_discoverable.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    //make a thing happen
+                    Intent intent_make_discoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                    startActivityForResult(intent_make_discoverable, MAKE_DISCOVERABLE_REQUEST);
+                }
+            });
+
+            // Toggle for enabling and disabling bluetooth
+            toggle_bluetooth_enabled = (ToggleButton) findViewById(R.id.toggle_bluetooth_enabled);
+            toggle_bluetooth_enabled.setChecked(ourBluetoothAdapter.isEnabled());
+            toggle_bluetooth_enabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        // The toggle is enabled
+                        Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                        startActivityForResult(turnOnIntent, REQUEST_ENABLE_BT);
+                        Toast.makeText(getApplicationContext(),"Bluetooth turned on" ,
+                                Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        // The toggle is disabled
+                        ourBluetoothAdapter.disable();
+                        Toast.makeText(getApplicationContext(),"Bluetooth turned off", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+>>>>>>> 08fd79484bdcf2097e6ec5e615e5aeee44bd6d48
     }
 
     @Override
@@ -79,6 +127,11 @@ public class MainActivity extends ActionBarActivity {
 
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
+            }
+        }
+        else if (requestCode == REQUEST_ENABLE_BT) {
+            if(ourBluetoothAdapter.isEnabled()) {
+
             }
         }
     }
