@@ -7,8 +7,11 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.CountDownTimer;
+import android.os.Message;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ArrayAdapter;
@@ -23,6 +26,7 @@ import android.widget.ListView;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.logging.LogRecord;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -30,11 +34,16 @@ public class MainActivity extends ActionBarActivity {
 
     static final int MAKE_DISCOVERABLE_REQUEST = 1;
     static final int REQUEST_ENABLE_BT = 2;
+    private static final String TAG = "Compet~1";
+
+    private Handler uiHandler;
 
     private BluetoothAdapter ourBluetoothAdapter;
 
+    private int connectivityState;
+
     private ToggleButton toggle_bluetooth_enabled;
-    private Button button_make_discoverable;
+    private Button button_start_server;
     private Button button_search_for_devices;
 
     private CountDownTimer countdownSinceSearch;
@@ -45,6 +54,12 @@ public class MainActivity extends ActionBarActivity {
     static final int BACKGROUND_GREEN = 0x2;
     static final int BACKGROUND_BLUE = 0x4;
     static final int BACKGROUND_YELLOW = 0x8;
+
+    static final int CONNECTIVITY_NONE = 0x0;
+    static final int CONNECTIVITY_LISTENING = 0x1;
+    static final int CONNECTIVITY_CONNECTING = 0x2;
+    static final int CONNECTIVITY_CONNECTED_CLIENT = 0x4;
+    static final int CONNECTIVITY_CONNECTED_SERVER = 0x8;
 
     private ListView deviceList;
     private Vector<BluetoothDevice> pairedDevices;
@@ -60,8 +75,17 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        button_make_discoverable = (Button) findViewById(R.id.button_make_discoverable);
-        button_make_discoverable.setOnClickListener(new View.OnClickListener() {
+        /* wherein we instantiate a message handler */
+        uiHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle b = msg.getData();
+                Log.i(TAG, "Message: " + b.getString("key"));
+            }
+        };
+
+        button_start_server = (Button) findViewById(R.id.button_start_server);
+        button_start_server.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //make a thing happen
                 Intent intent_make_discoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -110,8 +134,8 @@ public class MainActivity extends ActionBarActivity {
             // Warn user
             Toast.makeText(getApplicationContext(), R.string.warning_bluetooth_unsupported, Toast.LENGTH_LONG).show();
         } else {
-            button_make_discoverable = (Button) findViewById(R.id.button_make_discoverable);
-            button_make_discoverable.setOnClickListener(new View.OnClickListener() {
+            button_start_server = (Button) findViewById(R.id.button_start_server);
+            button_start_server.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     //make a thing happen
                     Intent intent_make_discoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -193,10 +217,13 @@ public class MainActivity extends ActionBarActivity {
                 toast.show();
             } else {
                 //cancelled?
-                CharSequence text = "Your device is discoverable for " + String.valueOf(resultCode) + " seconds";
+                CharSequence text = "Okay, hosting now...";
 
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
+
+                connectivityState = CONNECTIVITY_LISTENING;
+                beginServerListening(ourBluetoothAdapter);
             }
         }
         else if (requestCode == REQUEST_ENABLE_BT) {
@@ -367,7 +394,7 @@ public class MainActivity extends ActionBarActivity {
     };
 
     private void enableBluetoothButtons(boolean enabled) {
-        button_make_discoverable.setEnabled(enabled);
+        button_start_server.setEnabled(enabled);
         button_search_for_devices.setEnabled(enabled);
     };
 
@@ -380,7 +407,7 @@ public class MainActivity extends ActionBarActivity {
             return;
         }
 
-        ClientThread clientThread = new ClientThread(bluetoothSocket);
+        ClientThread clientThread = new ClientThread(bluetoothSocket, uiHandler);
         clientThread.start();
     }
 
@@ -392,7 +419,7 @@ public class MainActivity extends ActionBarActivity {
             return;
         }
 
-        ServerThread serverThread = new ServerThread(bluetoothServerSocket);
+        ServerThread serverThread = new ServerThread(bluetoothServerSocket, uiHandler);
         serverThread.start();
     }
 }
