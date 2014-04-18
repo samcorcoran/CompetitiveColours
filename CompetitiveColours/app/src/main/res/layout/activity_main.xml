@@ -54,7 +54,6 @@
             android:id="@+id/device_list_title" />
 
         <TextView
-            android:text="@string/device_list_time_elapsed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/device_list_time_elapsed" />
