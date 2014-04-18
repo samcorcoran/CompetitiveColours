@@ -13,6 +13,8 @@ public class ClientThread extends Thread {
     private final BluetoothSocket bluetoothSocket;
     private final Handler handler;
 
+    private ConnectedThread connectedThread;
+
     public ClientThread(BluetoothSocket bts, Handler h) {
         handler = h;
         bluetoothSocket = bts;
@@ -35,7 +37,6 @@ public class ClientThread extends Thread {
         if (bluetoothSocket.isConnected()) {
             // Do work to manage the connection (in a separate thread)
             forkCommunicationThread(bluetoothSocket, handler);
-            cancel();
         }
     }
 
@@ -48,7 +49,13 @@ public class ClientThread extends Thread {
     }
 
     private void forkCommunicationThread(BluetoothSocket bts, Handler h) {
-        ConnectedThread connectedThread = new ConnectedThread(bts, h);
+        connectedThread = new ConnectedThread(bts, h);
         connectedThread.start();
+    }
+
+    public void writeToServer(String message) {
+        if (connectedThread != null) {
+            connectedThread.write(message.getBytes());
+        }
     }
 }

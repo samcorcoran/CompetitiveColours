@@ -325,6 +325,12 @@ public class MainActivity extends ActionBarActivity {
             default:
                 main_view.setBackgroundColor(Color.parseColor("#FFFAFA"));
         }
+        if (clientThread != null) {
+            clientThread.writeToServer("COLOUR:"+String.valueOf(bg));
+        }
+        if (serverThread != null) {
+            serverThread.writeToAllClients("COLOUR:"+String.valueOf(bg));
+        }
     }
 
     protected void setBackgroundRed() {

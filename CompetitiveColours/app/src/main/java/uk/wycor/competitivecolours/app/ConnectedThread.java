@@ -55,6 +55,16 @@ public class ConnectedThread extends Thread {
                 // Send the obtained bytes to the UI activity
                 handler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                         .sendToTarget();
+                String message = new String(buffer);
+                String[] parts = message.split(":");
+                if (parts.length == 2) {
+                    int newbgcolour = Integer.parseInt(parts[1]);
+                    Message m = handler.obtainMessage();
+                    Bundle b = m.getData();
+                    b.putString("key", "client changed colour");
+                    b.putInt(MainActivity.COLOUR_CHANGE_EVENT, newbgcolour);
+                    handler.sendMessage(m);
+                }
             } catch (IOException e) {
                 break;
             }
