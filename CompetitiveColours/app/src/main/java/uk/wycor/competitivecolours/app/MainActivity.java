@@ -37,6 +37,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        button_make_discoverable = (Button) findViewById(R.id.button_make_discoverable);
 
         button_make_discoverable.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
