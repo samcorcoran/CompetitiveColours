@@ -15,6 +15,11 @@ public class MainActivity extends ActionBarActivity {
 
     static final int MAKE_DISCOVERABLE_REQUEST = 1;
 
+    static final int BACKGROUND_RED = 0x1;
+    static final int BACKGROUND_GREEN = 0x2;
+    static final int BACKGROUND_BLUE = 0x4;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +77,21 @@ public class MainActivity extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    protected void setBackgroundRed() {
+        View main_view = findViewById(R.id.main_layout);
+        main_view.setBackgroundColor(getResources().getColor(R.color.background_red));
+    }
+
+    protected void setBackgroundGreen() {
+        View main_view = findViewById(R.id.main_layout);
+        main_view.setBackgroundColor(getResources().getColor(R.color.background_green));
+    }
+
+    protected void setBackgroundBlue() {
+        View main_view = findViewById(R.id.main_layout);
+        main_view.setBackgroundColor(getResources().getColor(R.color.background_blue));
     }
 
 }
