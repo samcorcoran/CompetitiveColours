@@ -1,5 +1,6 @@
 package uk.wycor.competitivecolours.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.bluetooth.*;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -33,14 +35,21 @@ public class MainActivity extends ActionBarActivity {
         // Check which request we're responding to
         if (requestCode == MAKE_DISCOVERABLE_REQUEST) {
             // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
+            Context context = getApplicationContext();
+            int duration = Toast.LENGTH_SHORT;
 
-                // Do something with the contact here (bigger example below)
+            if (resultCode == RESULT_OK) {
+                // I don't know!!
+                CharSequence text = "Your device is now discoverable.";
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
             } else {
                 //cancelled?
-                
+                CharSequence text = "Why did you cancel this?!";
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
             }
         }
     }
