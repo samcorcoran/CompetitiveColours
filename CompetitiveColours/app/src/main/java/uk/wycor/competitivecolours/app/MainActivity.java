@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ArrayAdapter;
 import android.view.Menu;
@@ -18,9 +19,15 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.ListView;
 
+<<<<<<< HEAD
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
+=======
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+>>>>>>> 97601dd0c1f5791080f7ccedc857768121e82b79
 
 public class MainActivity extends ActionBarActivity {
 
@@ -43,7 +50,7 @@ public class MainActivity extends ActionBarActivity {
     static final int BACKGROUND_YELLOW = 0x8;
 
     private ListView deviceList;
-    private Set<BluetoothDevice> pairedDevices;
+    private Vector<BluetoothDevice> pairedDevices;
     private ArrayAdapter<String> BTArrayAdapter;
 
     protected Button button_red;
@@ -119,6 +126,8 @@ public class MainActivity extends ActionBarActivity {
                     }
                     else {
                         Toast.makeText(getApplicationContext(), "Searching for devices...", Toast.LENGTH_SHORT).show();
+                        BTArrayAdapter.clear();
+                        BTArrayAdapter.notifyDataSetChanged();
                         ourBluetoothAdapter.startDiscovery();
                         registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
                     }
@@ -150,9 +159,18 @@ public class MainActivity extends ActionBarActivity {
         this.registerReceiver(bluetoothReceiver, filter);
 
         // Use array adapter and list view to hold devices found
+        pairedDevices = new Vector<BluetoothDevice>();
         deviceList = (ListView)findViewById(R.id.device_list);
         BTArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
         deviceList.setAdapter(BTArrayAdapter);
+        deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Attempt connection to selected device
+                BluetoothDevice chosenDevice = pairedDevices.get(position);
+                //connectToGameServer(chosenDevice);
+            }
+        });
     }
 
     @Override
@@ -289,16 +307,6 @@ public class MainActivity extends ActionBarActivity {
         setBackground(BACKGROUND_YELLOW);
     }
 
-    public void listPairedDevices(View view){
-        // get paired devices
-        pairedDevices = ourBluetoothAdapter.getBondedDevices();
-        // put it's one to the adapter
-        for(BluetoothDevice device : pairedDevices)
-            BTArrayAdapter.add(device.getName()+ "\n" + device.getAddress());
-        Toast.makeText(getApplicationContext(),"Show Paired Devices",
-                Toast.LENGTH_SHORT).show();
-    }
-
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -312,6 +320,8 @@ public class MainActivity extends ActionBarActivity {
             else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                // Add to device list
+                pairedDevices.add(device);
                 // add the name and the MAC address of the object to the arrayAdapter
                 BTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
                 BTArrayAdapter.notifyDataSetChanged();
@@ -324,6 +334,7 @@ public class MainActivity extends ActionBarActivity {
         button_search_for_devices.setEnabled(enabled);
     };
 
+<<<<<<< HEAD
     private void beginClientConnection(BluetoothDevice bluetoothDevice) {
         BluetoothSocket bluetoothSocket;
         try {
@@ -348,4 +359,8 @@ public class MainActivity extends ActionBarActivity {
         ServerThread serverThread = new ServerThread(bluetoothServerSocket);
         serverThread.start();
     }
+=======
+    private void connectToGameServer(BluetoothDevice gameServer) {
+    };
+>>>>>>> 97601dd0c1f5791080f7ccedc857768121e82b79
 }
