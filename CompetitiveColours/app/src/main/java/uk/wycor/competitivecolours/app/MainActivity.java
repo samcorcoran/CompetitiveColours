@@ -17,9 +17,14 @@ import android.view.View;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.widget.ListView;
+
+import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 public class MainActivity extends ActionBarActivity {
+
+    public static final UUID CCUUID = UUID.fromString("30d9ff20-e01d-be4f-7183-55a0c0e01c40");
 
     static final int MAKE_DISCOVERABLE_REQUEST = 1;
     static final int REQUEST_ENABLE_BT = 2;
@@ -318,4 +323,29 @@ public class MainActivity extends ActionBarActivity {
         button_make_discoverable.setEnabled(enabled);
         button_search_for_devices.setEnabled(enabled);
     };
+
+    private void beginClientConnection(BluetoothDevice bluetoothDevice) {
+        BluetoothSocket bluetoothSocket;
+        try {
+            bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(CCUUID);
+        } catch (IOException e) {
+            // flash a big message here and don't continue
+            return;
+        }
+
+        ClientThread clientThread = new ClientThread(bluetoothSocket);
+        clientThread.start();
+    }
+
+    private void beginServerListening(BluetoothAdapter bluetoothAdapter) {
+        BluetoothServerSocket bluetoothServerSocket;
+        try {
+            bluetoothServerSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord(getResources().getString(R.string.app_name), CCUUID);
+        } catch (IOException e) {
+            return;
+        }
+
+        ServerThread serverThread = new ServerThread(bluetoothServerSocket);
+        serverThread.start();
+    }
 }
