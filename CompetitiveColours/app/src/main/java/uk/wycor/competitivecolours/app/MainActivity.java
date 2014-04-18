@@ -36,9 +36,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-<<<<<<< HEAD
 
-        final Button button_make_discoverable = (Button) findViewById(R.id.button_make_discoverable);
+
         button_make_discoverable.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //make a thing happen
@@ -66,7 +65,7 @@ public class MainActivity extends ActionBarActivity {
                 setBackgroundBlue();
             }
         });
-=======
+
         ourBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if(ourBluetoothAdapter == null) {
@@ -104,7 +103,6 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
         }
->>>>>>> 08fd79484bdcf2097e6ec5e615e5aeee44bd6d48
     }
 
     @Override
