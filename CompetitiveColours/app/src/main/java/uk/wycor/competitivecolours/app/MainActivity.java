@@ -1,14 +1,17 @@
 package uk.wycor.competitivecolours.app;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Message;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -350,6 +353,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
+        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
@@ -388,6 +392,18 @@ public class MainActivity extends ActionBarActivity {
                         timeSinceSearchMsg.setText("(>1 min since last device search...)");
                     }
                 }.start();
+
+                // Filter non-servers out of device list
+                for (BluetoothDevice device : pairedDevices) {
+                    if (!device.fetchUuidsWithSdp()) {
+                        String msg = "uuid collection failed for device " + device.getName();
+                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        String msg = "Device " + device.getName() + " uuid: " + device.getUuids();
+                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                    }
+                }
 
                 // Announce number of devices found
                 String msg;
