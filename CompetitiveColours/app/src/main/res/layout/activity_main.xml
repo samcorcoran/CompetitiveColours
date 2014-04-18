@@ -32,7 +32,6 @@
             android:checked="false"
             android:textOn="@string/toggle_bluetooth_on"
             android:textOff="@string/toggle_bluetooth_off"
-            android:layout_below="@+id/button_make_discoverable"
             android:layout_centerHorizontal="true"
             android:id="@+id/toggle_bluetooth_enabled" />
 
@@ -42,7 +41,6 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/button_make_discoverable"
             android:id="@+id/button_make_discoverable"
-            android:layout_below="@+id/textView"
             android:layout_centerHorizontal="true"
             android:textColor="@android:color/primary_text_light" />
 
@@ -52,9 +50,14 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/button_search_for_devices"
             android:id="@+id/button_search_for_devices"
-            android:layout_below="@+id/textView"
             android:layout_centerHorizontal="true"
             android:textColor="@android:color/primary_text_light" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/device_list">
+            </ListView>
 
     </LinearLayout>
     <LinearLayout

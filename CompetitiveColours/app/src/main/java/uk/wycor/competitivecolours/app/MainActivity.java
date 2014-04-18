@@ -7,13 +7,15 @@ import android.content.IntentFilter;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.bluetooth.*;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import android.widget.ListView;
+import java.util.Set;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -24,10 +26,15 @@ public class MainActivity extends ActionBarActivity {
 
     private ToggleButton toggle_bluetooth_enabled;
     private Button button_make_discoverable;
+    private Button button_search_for_devices;
 
     static final int BACKGROUND_RED = 0x1;
     static final int BACKGROUND_GREEN = 0x2;
     static final int BACKGROUND_BLUE = 0x4;
+
+    private ListView deviceList;
+    private Set<BluetoothDevice> pairedDevices;
+    private ArrayAdapter<String> BTArrayAdapter;
 
     protected Button button_red;
     protected Button button_green;
@@ -85,6 +92,22 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
 
+            button_search_for_devices = (Button) findViewById(R.id.button_search_for_devices);
+            button_search_for_devices.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    //make a thing happen
+                    if (ourBluetoothAdapter.isDiscovering()) {
+                        ourBluetoothAdapter.cancelDiscovery();
+                        Toast.makeText(getApplicationContext(), "Search for devices cancelled", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Searching for devices...", Toast.LENGTH_SHORT).show();
+                        ourBluetoothAdapter.startDiscovery();
+                        registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+                    }
+                }
+            });
+
             // Toggle for enabling and disabling bluetooth
             toggle_bluetooth_enabled = (ToggleButton) findViewById(R.id.toggle_bluetooth_enabled);
             toggle_bluetooth_enabled.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +130,12 @@ public class MainActivity extends ActionBarActivity {
 
         // Register for broadcasts on BluetoothAdapter state change
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-        this.registerReceiver(bluetoothSettingsChangeReceiver, filter);
+        this.registerReceiver(bluetoothReceiver, filter);
+
+        // Use array adapter and list view to hold devices found
+        deviceList = (ListView)findViewById(R.id.device_list);
+        BTArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        deviceList.setAdapter(BTArrayAdapter);
     }
 
     @Override
@@ -181,7 +209,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.unregisterReceiver(bluetoothSettingsChangeReceiver);
+        this.unregisterReceiver(bluetoothReceiver);
     }
 
     private void updateBluetoothToggle() {
@@ -218,7 +246,17 @@ public class MainActivity extends ActionBarActivity {
         main_view.setBackgroundColor(getResources().getColor(R.color.background_blue));
     }
 
-    private final BroadcastReceiver bluetoothSettingsChangeReceiver = new BroadcastReceiver() {
+    public void listPairedDevices(View view){
+        // get paired devices
+        pairedDevices = ourBluetoothAdapter.getBondedDevices();
+        // put it's one to the adapter
+        for(BluetoothDevice device : pairedDevices)
+            BTArrayAdapter.add(device.getName()+ "\n" + device.getAddress());
+        Toast.makeText(getApplicationContext(),"Show Paired Devices",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
@@ -228,7 +266,14 @@ public class MainActivity extends ActionBarActivity {
                         BluetoothAdapter.ERROR);
                 updateBluetoothToggle(state);
             }
+            else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Get the BluetoothDevice object from the Intent
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                // add the name and the MAC address of the object to the arrayAdapter
+                BTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                BTArrayAdapter.notifyDataSetChanged();
+            }
+
         }
     };
-
 }
