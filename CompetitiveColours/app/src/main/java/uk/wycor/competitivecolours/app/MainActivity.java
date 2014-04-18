@@ -93,9 +93,6 @@ public class MainActivity extends ActionBarActivity {
                         // The toggle is enabled
                         Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                         startActivityForResult(turnOnIntent, REQUEST_ENABLE_BT);
-                        Toast.makeText(getApplicationContext(),"Bluetooth turned on" ,
-                                Toast.LENGTH_SHORT).show();
-
                     } else {
                         // The toggle is disabled
                         ourBluetoothAdapter.disable();
@@ -109,10 +106,11 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+
         if (requestCode == MAKE_DISCOVERABLE_REQUEST) {
             // Make sure the request was successful
-            Context context = getApplicationContext();
-            int duration = Toast.LENGTH_SHORT;
 
             if (resultCode == RESULT_CANCELED) {
                 // I don't know!!
@@ -129,9 +127,18 @@ public class MainActivity extends ActionBarActivity {
             }
         }
         else if (requestCode == REQUEST_ENABLE_BT) {
+
+            if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(context, "It won't work if you don't play along", duration).show();
+            } else {
+                Toast.makeText(context, "Bluetooth turned on", duration).show();
+            }
+
+            /*
             if(ourBluetoothAdapter.isEnabled()) {
 
             }
+            */
         }
     }
 
