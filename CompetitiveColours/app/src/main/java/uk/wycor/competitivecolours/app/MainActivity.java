@@ -20,6 +20,10 @@ public class MainActivity extends ActionBarActivity {
     static final int BACKGROUND_BLUE = 0x4;
 
 
+    protected Button button_red;
+    protected Button button_green;
+    protected Button button_blue;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +35,26 @@ public class MainActivity extends ActionBarActivity {
                 //make a thing happen
                 Intent intent_make_discoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
                 startActivityForResult(intent_make_discoverable, MAKE_DISCOVERABLE_REQUEST);
+            }
+        });
+
+        button_red = (Button) findViewById(R.id.button_red);
+        button_green = (Button) findViewById(R.id.button_green);
+        button_blue = (Button) findViewById(R.id.button_blue);
+
+        button_red.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setBackgroundRed();
+            }
+        });
+        button_green.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setBackgroundGreen();
+            }
+        });
+        button_blue.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setBackgroundBlue();
             }
         });
     }
