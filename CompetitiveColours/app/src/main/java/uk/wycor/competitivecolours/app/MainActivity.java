@@ -41,6 +41,8 @@ public class MainActivity extends ActionBarActivity {
     private BluetoothAdapter ourBluetoothAdapter;
 
     private int connectivityState;
+    private ServerThread serverThread;
+    private ClientThread clientThread;
 
     private ToggleButton toggle_bluetooth_enabled;
     private Button button_start_server;
@@ -60,6 +62,8 @@ public class MainActivity extends ActionBarActivity {
     static final int CONNECTIVITY_CONNECTING = 0x2;
     static final int CONNECTIVITY_CONNECTED_CLIENT = 0x4;
     static final int CONNECTIVITY_CONNECTED_SERVER = 0x8;
+
+    static final String COLOUR_CHANGE_EVENT = "whoop";
 
     private ListView deviceList;
     private Vector<BluetoothDevice> pairedDevices;
@@ -81,6 +85,9 @@ public class MainActivity extends ActionBarActivity {
             public void handleMessage(Message msg) {
                 Bundle b = msg.getData();
                 Log.i(TAG, "Message: " + b.getString("key"));
+                if (b.containsKey(COLOUR_CHANGE_EVENT)) {
+                    setBackground(b.getInt(COLOUR_CHANGE_EVENT));
+                }
             }
         };
 
@@ -398,7 +405,21 @@ public class MainActivity extends ActionBarActivity {
         button_search_for_devices.setEnabled(enabled);
     };
 
+    private void clearCurrentThreads() {
+
+        if (clientThread != null) {
+            clientThread.cancel();
+            clientThread = null;
+        }
+
+        if (serverThread != null) {
+            serverThread.cancel();
+            serverThread = null;
+        }
+    }
+
     private void beginClientConnection(BluetoothDevice bluetoothDevice) {
+        clearCurrentThreads();
         BluetoothSocket bluetoothSocket;
         try {
             bluetoothSocket = bluetoothDevice.createRfcommSocketToServiceRecord(CCUUID);
@@ -407,11 +428,12 @@ public class MainActivity extends ActionBarActivity {
             return;
         }
 
-        ClientThread clientThread = new ClientThread(bluetoothSocket, uiHandler);
+        clientThread = new ClientThread(bluetoothSocket, uiHandler);
         clientThread.start();
     }
 
     private void beginServerListening(BluetoothAdapter bluetoothAdapter) {
+        clearCurrentThreads();
         BluetoothServerSocket bluetoothServerSocket;
         try {
             bluetoothServerSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord(getResources().getString(R.string.app_name), CCUUID);
@@ -419,7 +441,7 @@ public class MainActivity extends ActionBarActivity {
             return;
         }
 
-        ServerThread serverThread = new ServerThread(bluetoothServerSocket, uiHandler);
+        serverThread = new ServerThread(bluetoothServerSocket, uiHandler);
         serverThread.start();
     }
 }
