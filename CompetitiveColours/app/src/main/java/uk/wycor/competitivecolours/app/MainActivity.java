@@ -114,6 +114,8 @@ public class MainActivity extends ActionBarActivity {
                     }
                     else {
                         Toast.makeText(getApplicationContext(), "Searching for devices...", Toast.LENGTH_SHORT).show();
+                        BTArrayAdapter.clear();
+                        BTArrayAdapter.notifyDataSetChanged();
                         ourBluetoothAdapter.startDiscovery();
                         registerReceiver(bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
                     }
