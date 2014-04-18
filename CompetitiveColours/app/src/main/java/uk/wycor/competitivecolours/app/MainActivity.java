@@ -1,7 +1,9 @@
 package uk.wycor.competitivecolours.app;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -26,7 +28,6 @@ public class MainActivity extends ActionBarActivity {
     static final int BACKGROUND_RED = 0x1;
     static final int BACKGROUND_GREEN = 0x2;
     static final int BACKGROUND_BLUE = 0x4;
-
 
     protected Button button_red;
     protected Button button_green;
@@ -86,9 +87,10 @@ public class MainActivity extends ActionBarActivity {
 
             // Toggle for enabling and disabling bluetooth
             toggle_bluetooth_enabled = (ToggleButton) findViewById(R.id.toggle_bluetooth_enabled);
-            toggle_bluetooth_enabled.setChecked(ourBluetoothAdapter.isEnabled());
-            toggle_bluetooth_enabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            toggle_bluetooth_enabled.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View view) {
+                    // Is the toggle on?
+                    boolean isChecked = ((ToggleButton) view).isChecked();
                     if (isChecked) {
                         // The toggle is enabled
                         Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -96,11 +98,16 @@ public class MainActivity extends ActionBarActivity {
                     } else {
                         // The toggle is disabled
                         ourBluetoothAdapter.disable();
-                        Toast.makeText(getApplicationContext(),"Bluetooth turned off", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Bluetooth turned off", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
+            updateBluetoothToggle();
         }
+
+        // Register for broadcasts on BluetoothAdapter state change
+        IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        this.registerReceiver(bluetoothSettingsChangeReceiver, filter);
     }
 
     @Override
@@ -134,6 +141,8 @@ public class MainActivity extends ActionBarActivity {
                 Toast.makeText(context, "Bluetooth turned on", duration).show();
             }
 
+            updateBluetoothToggle();
+
             /*
             if(ourBluetoothAdapter.isEnabled()) {
 
@@ -162,6 +171,38 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateBluetoothToggle();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.unregisterReceiver(bluetoothSettingsChangeReceiver);
+    }
+
+    private void updateBluetoothToggle() {
+        toggle_bluetooth_enabled = (ToggleButton) findViewById(R.id.toggle_bluetooth_enabled);
+        toggle_bluetooth_enabled.setChecked(ourBluetoothAdapter.isEnabled());
+    }
+
+    private void updateBluetoothToggle(int state) {
+        toggle_bluetooth_enabled = (ToggleButton) findViewById(R.id.toggle_bluetooth_enabled);
+        switch (state) {
+            case BluetoothAdapter.STATE_OFF:
+            case BluetoothAdapter.STATE_TURNING_OFF:
+                toggle_bluetooth_enabled.setChecked(false);
+            break;
+            case BluetoothAdapter.STATE_ON:
+            case BluetoothAdapter.STATE_TURNING_ON:
+                toggle_bluetooth_enabled.setChecked(true);
+                break;
+        }
+    }
+
     protected void setBackgroundRed() {
         View main_view = findViewById(R.id.main_layout);
         main_view.setBackgroundColor(getResources().getColor(R.color.background_red));
@@ -176,5 +217,18 @@ public class MainActivity extends ActionBarActivity {
         View main_view = findViewById(R.id.main_layout);
         main_view.setBackgroundColor(getResources().getColor(R.color.background_blue));
     }
+
+    private final BroadcastReceiver bluetoothSettingsChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+
+            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
+                        BluetoothAdapter.ERROR);
+                updateBluetoothToggle(state);
+            }
+        }
+    };
 
 }
