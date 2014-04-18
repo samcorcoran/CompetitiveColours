@@ -52,6 +52,8 @@ public class ConnectedThread extends Thread {
         String line = null;
         try {
             while ((line = br.readLine()) != null) {
+                Message m = handler.obtainMessage();
+                Bundle b = m.getData();
                 // Keep listening to the InputStream until an exception occurs
                 // Read from the InputStream
                 /*
@@ -60,15 +62,13 @@ public class ConnectedThread extends Thread {
                 handler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                         .sendToTarget();
                 String message = new String(buffer);*/
+                b.putString("key", "message received!");
                 String[] parts = line.split(":");
                 if (parts.length == 2) {
                     int newbgcolour = Integer.parseInt(parts[1]);
-                    Message m = handler.obtainMessage();
-                    Bundle b = m.getData();
-                    b.putString("key", "client changed colour");
                     b.putInt(MainActivity.COLOUR_CHANGE_EVENT, newbgcolour);
-                    handler.sendMessage(m);
                 }
+                handler.sendMessage(m);
             }
         } catch (IOException e) {
 
@@ -80,6 +80,11 @@ public class ConnectedThread extends Thread {
         try {
             outputStream.write(bytes);
         } catch (IOException e) { }
+    }
+
+    public void writeln(String string) {
+        string = String.format(string + "%n");
+        write(string.getBytes());
     }
 
     /* Call this from the main activity to shutdown the connection */

@@ -64,7 +64,7 @@ public class ServerThread extends Thread {
 
     public void writeToAllClients(String message) {
         for (ConnectedThread thread : serverThreads.values()) {
-            thread.write(message.getBytes());
+            thread.writeln(message);
         }
     }
 }

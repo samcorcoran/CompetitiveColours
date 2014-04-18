@@ -55,7 +55,7 @@ public class ClientThread extends Thread {
 
     public void writeToServer(String message) {
         if (connectedThread != null) {
-            connectedThread.write(message.getBytes());
+            connectedThread.writeln(message);
         }
     }
 }
