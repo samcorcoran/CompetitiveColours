@@ -168,14 +168,6 @@ public class MainActivity extends ActionBarActivity {
             } else {
                 Toast.makeText(context, "Bluetooth turned on", duration).show();
             }
-
-            updateBluetoothToggle();
-
-            /*
-            if(ourBluetoothAdapter.isEnabled()) {
-
-            }
-            */
         }
     }
 
@@ -213,20 +205,26 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void updateBluetoothToggle() {
-        toggle_bluetooth_enabled = (ToggleButton) findViewById(R.id.toggle_bluetooth_enabled);
-        toggle_bluetooth_enabled.setChecked(ourBluetoothAdapter.isEnabled());
+        if (ourBluetoothAdapter.isEnabled()) {
+            updateBluetoothToggle(BluetoothAdapter.STATE_ON);
+        } else {
+            updateBluetoothToggle(BluetoothAdapter.STATE_OFF);
+        }
     }
 
     private void updateBluetoothToggle(int state) {
+        // Enable/disable bluetooth-dependent buttons
         toggle_bluetooth_enabled = (ToggleButton) findViewById(R.id.toggle_bluetooth_enabled);
         switch (state) {
             case BluetoothAdapter.STATE_OFF:
             case BluetoothAdapter.STATE_TURNING_OFF:
                 toggle_bluetooth_enabled.setChecked(false);
+                enableBluetoothButtons(false);
             break;
             case BluetoothAdapter.STATE_ON:
             case BluetoothAdapter.STATE_TURNING_ON:
                 toggle_bluetooth_enabled.setChecked(true);
+                enableBluetoothButtons(true);
                 break;
         }
     }
@@ -273,7 +271,11 @@ public class MainActivity extends ActionBarActivity {
                 BTArrayAdapter.add(device.getName() + "\n" + device.getAddress());
                 BTArrayAdapter.notifyDataSetChanged();
             }
-
         }
+    };
+
+    private void enableBluetoothButtons(boolean enabled) {
+        button_make_discoverable.setEnabled(enabled);
+        button_search_for_devices.setEnabled(enabled);
     };
 }
