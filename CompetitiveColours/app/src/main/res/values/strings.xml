@@ -3,6 +3,6 @@
 
     <string name="app_name">CompetitiveColours</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Settings</string><string name="button_make_discoverable">MAKE THIS DEVICE DISCOVERABLE!!</string>
 
 </resources>
