@@ -38,15 +38,15 @@ public class MainActivity extends ActionBarActivity {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
 
-            if (resultCode == RESULT_OK) {
+            if (resultCode == RESULT_CANCELED) {
                 // I don't know!!
-                CharSequence text = "Your device is now discoverable.";
+                CharSequence text = "Why did you cancel this?!";
 
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
             } else {
                 //cancelled?
-                CharSequence text = "Why did you cancel this?!";
+                CharSequence text = "Your device is discoverable for " + String.valueOf(resultCode) + " seconds";
 
                 Toast toast = Toast.makeText(context, text, duration);
                 toast.show();
