@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Message;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,7 +30,6 @@ import android.widget.ListView;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.Vector;
-import java.util.logging.LogRecord;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -107,7 +105,7 @@ public class MainActivity extends ActionBarActivity {
         };
 
 
-        optionsDialog = new Dialog(this);
+        optionsDialog = new Dialog(this, R.style.TitlelessDialog);
         optionsDialog.setContentView(R.layout.dialog_options);
         optionsDialog.setTitle("Game setup");
 
@@ -496,8 +494,6 @@ public class MainActivity extends ActionBarActivity {
 
         serverThread = new ServerThread(bluetoothServerSocket, uiHandler);
         serverThread.start();
-
-        hideOptions();
     }
 
     private void displayOptions() {
