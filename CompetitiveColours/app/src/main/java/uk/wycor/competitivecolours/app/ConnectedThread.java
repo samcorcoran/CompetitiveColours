@@ -22,6 +22,8 @@ public class ConnectedThread extends Thread {
     private final InputStream inputStream;
     private final OutputStream outputStream;
 
+    private final boolean isClient;
+
     public ConnectedThread(BluetoothSocket bts, Handler h, boolean client) {
         bluetoothSocket = bts;
         handler = h;
@@ -38,10 +40,11 @@ public class ConnectedThread extends Thread {
         inputStream = tmpIn;
         outputStream = tmpOut;
 
+        isClient = client;
 
         Message m = handler.obtainMessage();
         Bundle b = m.getData();
-        if (client) {
+        if (isClient) {
             b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_CLIENT);
         } else {
             b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_SERVER);
@@ -63,7 +66,11 @@ public class ConnectedThread extends Thread {
 
                 Message m = handler.obtainMessage();
                 Bundle b = m.getData();
-                b.putString("key", "message received!"); //construct message
+                if (isClient) {
+                    b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_CLIENT);
+                } else {
+                    b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_SERVER);
+                }
 
                 switch (command) { //what command did it give us?!
                     case CommandBytes.COMMAND_COLOUR_CHANGE:
@@ -93,7 +100,14 @@ public class ConnectedThread extends Thread {
     public void cancel() {
         try {
             bluetoothSocket.close();
-        } catch (IOException e) { }
+        } catch (IOException e) {
+
+        }
+
+        Message m = handler.obtainMessage();
+        Bundle b = m.getData();
+        b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_NONE);
+        handler.sendMessage(m);
     }
 
 }

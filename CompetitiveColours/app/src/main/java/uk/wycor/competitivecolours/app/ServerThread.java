@@ -38,7 +38,10 @@ public class ServerThread extends Thread {
             try {
                 socket = serverSocket.accept();
             } catch (IOException e) {
-                break;
+                m = handler.obtainMessage();
+                b = m.getData();
+                b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_NONE);
+                handler.sendMessage(m);
             }
             // If a connection was accepted
             if (socket != null) {
@@ -54,6 +57,10 @@ public class ServerThread extends Thread {
         } catch (IOException e) {
             //EXPLODE
         }
+        Message m = handler.obtainMessage();
+        Bundle b = m.getData();
+        b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_NONE);
+        handler.sendMessage(m);
     }
 
     private void forkCommunicationThread(BluetoothSocket bts, Handler h) {

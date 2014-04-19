@@ -37,6 +37,11 @@ public class ClientThread extends Thread {
 
             }
             // Start the service over to restart listening mode
+
+            m = handler.obtainMessage();
+            b = m.getData();
+            b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_NONE);
+            handler.sendMessage(m);
             return;
         }
 
@@ -52,6 +57,10 @@ public class ClientThread extends Thread {
         } catch (IOException e) {
             //fuck you
         }
+        Message m = handler.obtainMessage();
+        Bundle b = m.getData();
+        b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_NONE);
+        handler.sendMessage(m);
     }
 
     private void forkCommunicationThread(BluetoothSocket bts, Handler h) {
