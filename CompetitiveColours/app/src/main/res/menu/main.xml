@@ -3,8 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="uk.wycor.competitivecolours.app.MainActivity" >
     
+    <item android:id="@+id/action_restart"
+        android:title="@string/action_restart"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="900"
         app:showAsAction="never" />
 </menu>

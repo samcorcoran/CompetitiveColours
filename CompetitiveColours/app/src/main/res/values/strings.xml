@@ -14,4 +14,5 @@
     <string name="button_green">GREEN</string>
     <string name="button_blue">BLUE!</string>
     <string name="button_yellow">yellow...</string>
+    <string name="action_restart">Restart...</string>
 </resources>

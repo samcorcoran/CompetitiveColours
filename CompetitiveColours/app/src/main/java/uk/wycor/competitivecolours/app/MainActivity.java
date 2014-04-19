@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -108,7 +109,16 @@ public class MainActivity extends ActionBarActivity {
 
         optionsDialog = new Dialog(this);
         optionsDialog.setContentView(R.layout.dialog_options);
-        optionsDialog.setTitle("Options");
+        optionsDialog.setTitle("Game setup");
+
+        optionsDialog.setOnDismissListener(new Dialog.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dli){
+                if ((serverThread == null) && (clientThread == null)) {
+                    displayOptions();
+                }
+            }
+        });
 
         button_start_server = (Button) optionsDialog.findViewById(R.id.button_start_server);
         button_start_server.setOnClickListener(new View.OnClickListener() {
@@ -163,7 +173,7 @@ public class MainActivity extends ActionBarActivity {
             button_start_server = (Button) optionsDialog.findViewById(R.id.button_start_server);
             button_start_server.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    //make a thing happen
+                    clearCurrentThreads();
                     Intent intent_make_discoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
                     startActivityForResult(intent_make_discoverable, MAKE_DISCOVERABLE_REQUEST);
                 }
@@ -172,12 +182,11 @@ public class MainActivity extends ActionBarActivity {
             button_search_for_devices = (Button) optionsDialog.findViewById(R.id.button_search_for_devices);
             button_search_for_devices.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    //make a thing happen
+                    clearCurrentThreads();
                     if (ourBluetoothAdapter.isDiscovering()) {
                         ourBluetoothAdapter.cancelDiscovery();
                         Toast.makeText(getApplicationContext(), "Search for devices cancelled", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                    } else {
                         Toast.makeText(getApplicationContext(), "Searching for devices...", Toast.LENGTH_LONG).show();
                         BTArrayAdapter.clear();
                         pairedDevices.clear();
@@ -252,6 +261,8 @@ public class MainActivity extends ActionBarActivity {
 
                 connectivityState = CONNECTIVITY_LISTENING;
                 beginServerListening(ourBluetoothAdapter);
+
+                optionsDialog.dismiss();
             }
         }
         else if (requestCode == REQUEST_ENABLE_BT) {
@@ -278,8 +289,15 @@ public class MainActivity extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                Toast.makeText(getApplicationContext(), "THERE ARE NO CONFIGURABLE SETTINGS", Toast.LENGTH_SHORT);
+                return true;
+            case R.id.action_restart:
+                if (!optionsDialog.isShowing()) {
+                    displayOptions();
+                }
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
