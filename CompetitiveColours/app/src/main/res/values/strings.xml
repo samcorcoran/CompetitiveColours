@@ -15,4 +15,18 @@
     <string name="button_blue">B!</string>
     <string name="button_yellow">y..</string>
     <string name="action_restart">Restart...</string>
+    <string name="button_start_game">LAUNCH!</string>
+    <string name="client_list_title">Connected players...</string>
+    <string name="select_game_type">Select game type...</string>
+    <string name="select_game_duration">Select game length...</string>
+    <string-array name="game_type_list">
+        <item>Simon</item>
+        <item>King of the Hue</item>
+        <item>Sandbox</item>
+    </string-array>
+    <string-array name="game_duration_list">
+        <item>60s</item>
+        <item>120s</item>
+        <item>300s</item>
+    </string-array>
 </resources>
