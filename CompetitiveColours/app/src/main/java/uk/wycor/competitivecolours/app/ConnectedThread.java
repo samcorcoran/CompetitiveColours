@@ -49,6 +49,7 @@ public class ConnectedThread extends Thread {
         } else {
             b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_SERVER);
         }
+        b.putString(MainActivity.DEVICE_NAME, bts.getRemoteDevice().getName());
         handler.sendMessage(m);
     }
 

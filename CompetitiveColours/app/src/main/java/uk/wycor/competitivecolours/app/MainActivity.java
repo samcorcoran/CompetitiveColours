@@ -56,6 +56,8 @@ public class MainActivity extends ActionBarActivity {
     private int currentBackground;
     // Flag to prevent 'search ended' toasts if game connection has begun
     private boolean connectingToGame;
+    // Log of capture actions, used to determine scoring
+    private GameLog gameLog;
 
     static final int BACKGROUND_RED = 0x1;
     static final int BACKGROUND_GREEN = 0x2;
@@ -72,6 +74,7 @@ public class MainActivity extends ActionBarActivity {
     static final String UNKNOWN_EVENT = "gah!";
     static final String QUERY_COLOUR_EVENT = "whatis?!";
     static final String CONNECTIVITY_STATUS = "statum";
+    static final String DEVICE_NAME = "whom";
 
     private ListView deviceList;
     private Vector<BluetoothDevice> pairedDevices;
@@ -96,6 +99,10 @@ public class MainActivity extends ActionBarActivity {
                 Bundle b = msg.getData();
                 if (b.containsKey(COLOUR_CHANGE_EVENT)) {
                     setBackground(b.getInt(COLOUR_CHANGE_EVENT));
+                    // Server logs colour change for scoring
+                    if (serverThread != null && b.containsKey(DEVICE_NAME)) {
+                        gameLog.logNewAction(b.getInt(COLOUR_CHANGE_EVENT), b.getString(DEVICE_NAME));
+                    }
                 }
                 if (b.containsKey(QUERY_COLOUR_EVENT)) {
                     pushBackground();
@@ -104,6 +111,7 @@ public class MainActivity extends ActionBarActivity {
                     connectivityState = b.getInt(CONNECTIVITY_STATUS);
                 }
                 if (serverThread != null) {
+                    // Update backgrounds of clients
                     pushBackground();
                 }
             }
