@@ -105,7 +105,12 @@ public class MainActivity extends ActionBarActivity {
             }
         };
 
-        button_start_server = (Button) findViewById(R.id.button_start_server);
+
+        optionsDialog = new Dialog(this);
+        optionsDialog.setContentView(R.layout.dialog_options);
+        optionsDialog.setTitle("Options");
+
+        button_start_server = (Button) optionsDialog.findViewById(R.id.button_start_server);
         button_start_server.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //make a thing happen
@@ -155,7 +160,7 @@ public class MainActivity extends ActionBarActivity {
             // Warn user
             Toast.makeText(getApplicationContext(), R.string.warning_bluetooth_unsupported, Toast.LENGTH_LONG).show();
         } else {
-            button_start_server = (Button) findViewById(R.id.button_start_server);
+            button_start_server = (Button) optionsDialog.findViewById(R.id.button_start_server);
             button_start_server.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     //make a thing happen
@@ -164,7 +169,7 @@ public class MainActivity extends ActionBarActivity {
                 }
             });
 
-            button_search_for_devices = (Button) findViewById(R.id.button_search_for_devices);
+            button_search_for_devices = (Button) optionsDialog.findViewById(R.id.button_search_for_devices);
             button_search_for_devices.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     //make a thing happen
@@ -183,7 +188,7 @@ public class MainActivity extends ActionBarActivity {
             });
 
             // Toggle for enabling and disabling bluetooth
-            toggle_bluetooth_enabled = (ToggleButton) findViewById(R.id.toggle_bluetooth_enabled);
+            toggle_bluetooth_enabled = (ToggleButton) optionsDialog.findViewById(R.id.toggle_bluetooth_enabled);
             toggle_bluetooth_enabled.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     // Is the toggle on?
@@ -208,7 +213,7 @@ public class MainActivity extends ActionBarActivity {
 
         // Use array adapter and list view to hold devices found
         pairedDevices = new Vector<BluetoothDevice>();
-        deviceList = (ListView)findViewById(R.id.device_list);
+        deviceList = (ListView)optionsDialog.findViewById(R.id.device_list);
         BTArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
         deviceList.setAdapter(BTArrayAdapter);
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -307,7 +312,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void updateBluetoothToggle(int state) {
         // Enable/disable bluetooth-dependent buttons
-        toggle_bluetooth_enabled = (ToggleButton) findViewById(R.id.toggle_bluetooth_enabled);
+        toggle_bluetooth_enabled = (ToggleButton) optionsDialog.findViewById(R.id.toggle_bluetooth_enabled);
         switch (state) {
             case BluetoothAdapter.STATE_OFF:
             case BluetoothAdapter.STATE_TURNING_OFF:
@@ -396,7 +401,7 @@ public class MainActivity extends ActionBarActivity {
                 // Finished searching for devices
 
                 // Use countdown timer to display time elapsed since last device search ended
-                final TextView timeSinceSearchMsg = (TextView) findViewById(R.id.device_list_time_elapsed);
+                final TextView timeSinceSearchMsg = (TextView) optionsDialog.findViewById(R.id.device_list_time_elapsed);
                 if (countdownInProgress)
                     countdownSinceSearch.cancel();
                 countdownInProgress = true;
@@ -488,8 +493,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void displayOptions() {
-        optionsDialog = new Dialog(this);
-        optionsDialog.setContentView(R.layout.options_layout);
-        optionsDialog.setTitle("Options");
+        optionsDialog.show();
     }
 }
