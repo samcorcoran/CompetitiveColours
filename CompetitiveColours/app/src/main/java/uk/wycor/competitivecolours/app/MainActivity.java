@@ -69,6 +69,7 @@ public class MainActivity extends ActionBarActivity {
     static final String COLOUR_CHANGE_EVENT = "whoop";
     static final String UNKNOWN_EVENT = "gah!";
     static final String QUERY_COLOUR_EVENT = "whatis?!";
+    static final String CONNECTIVITY_STATUS = "statum";
 
     private ListView deviceList;
     private Vector<BluetoothDevice> pairedDevices;
@@ -91,12 +92,14 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void handleMessage(Message msg) {
                 Bundle b = msg.getData();
-                Log.i(TAG, "Message: " + b.getString("key"));
                 if (b.containsKey(COLOUR_CHANGE_EVENT)) {
                     setBackground(b.getInt(COLOUR_CHANGE_EVENT));
                 }
                 if (b.containsKey(QUERY_COLOUR_EVENT)) {
                     pushBackground();
+                }
+                if (b.containsKey(CONNECTIVITY_STATUS)) {
+                    connectivityState = b.getInt(CONNECTIVITY_STATUS);
                 }
                 if (serverThread != null) {
                     pushBackground();
@@ -494,7 +497,7 @@ public class MainActivity extends ActionBarActivity {
 
         serverThread = new ServerThread(bluetoothServerSocket, uiHandler);
         serverThread.start();
-        
+
         hideOptions();
     }
 

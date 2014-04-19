@@ -1,7 +1,9 @@
 package uk.wycor.competitivecolours.app;
 
 import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 
 import java.io.IOException;
 
@@ -21,6 +23,10 @@ public class ClientThread extends Thread {
     }
 
     public void run() {
+        Message m = handler.obtainMessage();
+        Bundle b = m.getData();
+        b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTING);
+        handler.sendMessage(m);
         try {
             bluetoothSocket.connect();
         } catch (IOException e) {
@@ -49,7 +55,7 @@ public class ClientThread extends Thread {
     }
 
     private void forkCommunicationThread(BluetoothSocket bts, Handler h) {
-        connectedThread = new ConnectedThread(bts, h);
+        connectedThread = new ConnectedThread(bts, h, true);
         connectedThread.start();
     }
 

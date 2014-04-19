@@ -22,7 +22,7 @@ public class ConnectedThread extends Thread {
     private final InputStream inputStream;
     private final OutputStream outputStream;
 
-    public ConnectedThread(BluetoothSocket bts, Handler h) {
+    public ConnectedThread(BluetoothSocket bts, Handler h, boolean client) {
         bluetoothSocket = bts;
         handler = h;
         InputStream tmpIn = null;
@@ -41,7 +41,11 @@ public class ConnectedThread extends Thread {
 
         Message m = handler.obtainMessage();
         Bundle b = m.getData();
-        b.putString("key", "the connected thread has started. messages can begin");
+        if (client) {
+            b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_CLIENT);
+        } else {
+            b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_SERVER);
+        }
         handler.sendMessage(m);
     }
 

@@ -31,8 +31,7 @@ public class ServerThread extends Thread {
         // Keep listening until exception occurs or a socket is returned
         Message m = handler.obtainMessage();
         Bundle b = m.getData();
-        b.putString("key", "Background Task notify, server thread has started");
-        b.putInt(MainActivity.COLOUR_CHANGE_EVENT, MainActivity.BACKGROUND_GREEN);
+        b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_LISTENING);
         handler.sendMessage(m);
 
         while (true) {
@@ -58,7 +57,7 @@ public class ServerThread extends Thread {
     }
 
     private void forkCommunicationThread(BluetoothSocket bts, Handler h) {
-        serverThreads.put(bts.getRemoteDevice(), new ConnectedThread(bts, h));
+        serverThreads.put(bts.getRemoteDevice(), new ConnectedThread(bts, h, false));
         serverThreads.get(bts.getRemoteDevice()).start();
     }
 
