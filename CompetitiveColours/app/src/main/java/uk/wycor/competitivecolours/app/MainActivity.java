@@ -1,6 +1,7 @@
 package uk.wycor.competitivecolours.app;
 
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -78,6 +79,8 @@ public class MainActivity extends ActionBarActivity {
     protected Button button_green;
     protected Button button_blue;
     protected Button button_yellow;
+
+    private Dialog optionsDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,6 +219,8 @@ public class MainActivity extends ActionBarActivity {
                 beginClientConnection(chosenDevice);
             }
         });
+
+        displayOptions();
     }
 
     @Override
@@ -480,5 +485,11 @@ public class MainActivity extends ActionBarActivity {
 
         serverThread = new ServerThread(bluetoothServerSocket, uiHandler);
         serverThread.start();
+    }
+
+    private void displayOptions() {
+        optionsDialog = new Dialog(this);
+        optionsDialog.setContentView(R.layout.options_layout);
+        optionsDialog.setTitle("Options");
     }
 }
