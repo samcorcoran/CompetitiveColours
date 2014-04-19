@@ -17,7 +17,12 @@
     <string name="title_activity_host">HostActivity</string>
     <string name="game_start">START!</string>
     <string name="title_activity_game">GameActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="connected_clients">Connected Clients</string>
+    <string name="choose_game_type">Choose game type...</string>
+    <string-array name="game_type_array">
+        <item>Simon</item>
+        <item>King of the Palette</item>
+        <item>Sandbox</item>
+    </string-array>
 
 </resources>
