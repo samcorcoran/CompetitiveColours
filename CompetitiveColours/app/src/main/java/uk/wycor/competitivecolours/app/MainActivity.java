@@ -54,6 +54,8 @@ public class MainActivity extends ActionBarActivity {
     private CountDownTimer countdownSinceSearch;
     private boolean countdownInProgress;
     private int currentBackground;
+    // Flag to prevent 'search ended' toasts if game connection has begun
+    private boolean connectingToGame;
 
     static final int BACKGROUND_RED = 0x1;
     static final int BACKGROUND_GREEN = 0x2;
@@ -183,6 +185,9 @@ public class MainActivity extends ActionBarActivity {
             button_search_for_devices = (Button) optionsDialog.findViewById(R.id.button_search_for_devices);
             button_search_for_devices.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
+                    // Reset flag that inhibits 'search ended' toasts
+                    connectingToGame = false;
+
                     clearCurrentThreads();
                     if (ourBluetoothAdapter.isDiscovering()) {
                         ourBluetoothAdapter.cancelDiscovery();
@@ -229,6 +234,11 @@ public class MainActivity extends ActionBarActivity {
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                connectingToGame = true;
+                // Cancel further device discovery
+                if (ourBluetoothAdapter.isDiscovering()) {
+                    ourBluetoothAdapter.cancelDiscovery();
+                }
                 // Attempt connection to selected device
                 BluetoothDevice chosenDevice = pairedDevices.get(position);
                 beginClientConnection(chosenDevice);
@@ -436,18 +446,20 @@ public class MainActivity extends ActionBarActivity {
                 }.start();
 
                 // Announce number of devices found
-                String msg;
-                int numDevices = pairedDevices.size();
-                if (numDevices == 0) {
-                    msg = "No devices found";
+                if (!connectingToGame) {
+                    String msg;
+                    int numDevices = pairedDevices.size();
+                    if (numDevices == 0) {
+                        msg = "No devices found";
+                    }
+                    else {
+                        msg = Integer.toString(numDevices) + " device";
+                        if (numDevices > 1)
+                            msg += "s";
+                        msg += " found";
+                    }
+                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
                 }
-                else {
-                    msg = Integer.toString(numDevices) + " device";
-                    if (numDevices > 1)
-                        msg += "s";
-                    msg += " found";
-                }
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
             }
         }
     };
