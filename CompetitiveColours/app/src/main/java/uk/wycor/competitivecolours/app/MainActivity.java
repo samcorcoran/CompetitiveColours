@@ -494,6 +494,8 @@ public class MainActivity extends ActionBarActivity {
 
         serverThread = new ServerThread(bluetoothServerSocket, uiHandler);
         serverThread.start();
+        
+        hideOptions();
     }
 
     private void displayOptions() {
