@@ -67,6 +67,7 @@ public class MainActivity extends ActionBarActivity {
     static final int CONNECTIVITY_CONNECTED_SERVER = 0x8;
 
     static final String COLOUR_CHANGE_EVENT = "whoop";
+    static final String UNKNOWN_EVENT = "gah!";
 
     private ListView deviceList;
     private Vector<BluetoothDevice> pairedDevices;
@@ -335,10 +336,10 @@ public class MainActivity extends ActionBarActivity {
 
     private void pushBackground() {
         if (clientThread != null) {
-            clientThread.writeToServer("COLOUR:"+String.valueOf(currentBackground));
+            clientThread.write(CommandBytes.commandColourChange(currentBackground));
         }
         if (serverThread != null) {
-            serverThread.writeToAllClients("COLOUR:"+String.valueOf(currentBackground));
+            serverThread.writeAll(CommandBytes.commandColourChange(currentBackground));
         }
     }
 

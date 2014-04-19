@@ -62,9 +62,9 @@ public class ServerThread extends Thread {
         serverThreads.get(bts.getRemoteDevice()).start();
     }
 
-    public void writeToAllClients(String message) {
+    public void writeAll(byte[] message) {
         for (ConnectedThread thread : serverThreads.values()) {
-            thread.writeln(message);
+            thread.write(message);
         }
     }
 }

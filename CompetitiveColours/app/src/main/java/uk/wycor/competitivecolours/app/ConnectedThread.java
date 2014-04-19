@@ -46,45 +46,43 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[1024];  // buffer store for the stream
+        byte[] buffer; // = new byte[1024];  // buffer store for the stream
+        byte[] dataLength = new byte[1];
         int bytes; // bytes returned from read()
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-        String line = null;
-        try {
-            while ((line = br.readLine()) != null) {
+        while (true) {
+            try {
+                bytes = inputStream.read(dataLength); //read 1 byte to determine length of next chunk of datas
+                buffer = new byte[(int)dataLength[0]]; //craft a buffer of that length
+
+                bytes = inputStream.read(buffer); //read aforementioned agreed-upon length
+                int command = (int)buffer[0]; //get the command byte
+
                 Message m = handler.obtainMessage();
                 Bundle b = m.getData();
-                // Keep listening to the InputStream until an exception occurs
-                // Read from the InputStream
-                /*
-                bytes = inputStream.read(buffer);
-                // Send the obtained bytes to the UI activity
-                handler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-                        .sendToTarget();
-                String message = new String(buffer);*/
-                b.putString("key", "message received!");
-                String[] parts = line.split(":");
-                if (parts.length == 2) {
-                    int newbgcolour = Integer.parseInt(parts[1]);
-                    b.putInt(MainActivity.COLOUR_CHANGE_EVENT, newbgcolour);
-                }
-                handler.sendMessage(m);
-            }
-        } catch (IOException e) {
+                b.putString("key", "message received!"); //construct message
 
+                switch (command) { //what command did it give us?!
+                    case CommandBytes.COMMAND_COLOUR_CHANGE:
+                        int newBackground = (int)buffer[1];
+                        b.putInt(MainActivity.COLOUR_CHANGE_EVENT, newBackground);
+                        break;
+                    default:
+                        b.putByteArray(MainActivity.UNKNOWN_EVENT, buffer);
+                }
+
+                handler.sendMessage(m); //pass it all back up
+
+            } catch (IOException e) {
+                cancel();
+            }
         }
     }
 
     /* Call this from the main activity to send data to the remote device */
-    private void write(byte[] bytes) {
+    public void write(byte[] bytes) {
         try {
             outputStream.write(bytes);
         } catch (IOException e) { }
-    }
-
-    public void writeln(String string) {
-        string = String.format(string + "%n");
-        write(string.getBytes());
     }
 
     /* Call this from the main activity to shutdown the connection */
