@@ -113,8 +113,8 @@ public class MainActivity extends ActionBarActivity {
 
         optionsDialog.setOnDismissListener(new Dialog.OnDismissListener() {
             @Override
-            public void onDismiss(DialogInterface dli){
-                if ((serverThread == null) && (clientThread == null)) {
+            public void onDismiss(DialogInterface dli) {
+                if (!isInGame()) {
                     displayOptions();
                 }
             }
@@ -434,18 +434,6 @@ public class MainActivity extends ActionBarActivity {
                     }
                 }.start();
 
-                // Filter non-servers out of device list
-                for (BluetoothDevice device : pairedDevices) {
-                    if (!device.fetchUuidsWithSdp()) {
-                        String msg = "uuid collection failed for device " + device.getName();
-                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-                    }
-                    else {
-                        String msg = "Device " + device.getName() + " uuid: " + device.getUuids();
-                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-                    }
-                }
-
                 // Announce number of devices found
                 String msg;
                 int numDevices = pairedDevices.size();
@@ -520,5 +508,8 @@ public class MainActivity extends ActionBarActivity {
         if (optionsDialog.isShowing()) {
             optionsDialog.dismiss();
         }
+    } 
+    private boolean isInGame() {
+        return (serverThread != null) || (clientThread != null);
     }
 }
