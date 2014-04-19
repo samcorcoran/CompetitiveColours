@@ -91,6 +91,9 @@ public class MainActivity extends ActionBarActivity {
                 if (b.containsKey(COLOUR_CHANGE_EVENT)) {
                     setBackground(b.getInt(COLOUR_CHANGE_EVENT));
                 }
+                if (serverThread != null) {
+                    pushBackground();
+                }
             }
         };
 
