@@ -68,6 +68,7 @@ public class MainActivity extends ActionBarActivity {
 
     static final String COLOUR_CHANGE_EVENT = "whoop";
     static final String UNKNOWN_EVENT = "gah!";
+    static final String QUERY_COLOUR_EVENT = "whatis?!";
 
     private ListView deviceList;
     private Vector<BluetoothDevice> pairedDevices;
@@ -91,6 +92,9 @@ public class MainActivity extends ActionBarActivity {
                 Log.i(TAG, "Message: " + b.getString("key"));
                 if (b.containsKey(COLOUR_CHANGE_EVENT)) {
                     setBackground(b.getInt(COLOUR_CHANGE_EVENT));
+                }
+                if (b.containsKey(QUERY_COLOUR_EVENT)) {
+                    pushBackground();
                 }
                 if (serverThread != null) {
                     pushBackground();
