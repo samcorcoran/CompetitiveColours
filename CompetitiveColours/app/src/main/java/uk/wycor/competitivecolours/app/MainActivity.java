@@ -328,28 +328,35 @@ public class MainActivity extends ActionBarActivity {
             default:
                 main_view.setBackgroundColor(Color.parseColor("#FFFAFA"));
         }
+    }
+
+    private void pushBackground() {
         if (clientThread != null) {
-            clientThread.writeToServer("COLOUR:"+String.valueOf(bg));
+            clientThread.writeToServer("COLOUR:"+String.valueOf(currentBackground));
         }
         if (serverThread != null) {
-            serverThread.writeToAllClients("COLOUR:"+String.valueOf(bg));
+            serverThread.writeToAllClients("COLOUR:"+String.valueOf(currentBackground));
         }
     }
 
     protected void setBackgroundRed() {
         setBackground(BACKGROUND_RED);
+        pushBackground();
     }
 
     protected void setBackgroundGreen() {
         setBackground(BACKGROUND_GREEN);
+        pushBackground();
     }
 
     protected void setBackgroundBlue() {
         setBackground(BACKGROUND_BLUE);
+        pushBackground();
     }
 
     protected void setBackgroundYellow() {
         setBackground(BACKGROUND_YELLOW);
+        pushBackground();
     }
 
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
