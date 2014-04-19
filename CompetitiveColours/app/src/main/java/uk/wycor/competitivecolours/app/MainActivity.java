@@ -37,7 +37,6 @@ public class MainActivity extends ActionBarActivity {
 
     static final int MAKE_DISCOVERABLE_REQUEST = 1;
     static final int REQUEST_ENABLE_BT = 2;
-    private static final String TAG = "Compet~1";
 
     private Handler uiHandler;
 
@@ -53,12 +52,6 @@ public class MainActivity extends ActionBarActivity {
 
     private CountDownTimer countdownSinceSearch;
     private boolean countdownInProgress;
-    private int currentBackground;
-
-    static final int BACKGROUND_RED = 0x1;
-    static final int BACKGROUND_GREEN = 0x2;
-    static final int BACKGROUND_BLUE = 0x4;
-    static final int BACKGROUND_YELLOW = 0x8;
 
     static final int CONNECTIVITY_NONE = 0x0;
     static final int CONNECTIVITY_LISTENING = 0x1;
@@ -66,41 +59,14 @@ public class MainActivity extends ActionBarActivity {
     static final int CONNECTIVITY_CONNECTED_CLIENT = 0x4;
     static final int CONNECTIVITY_CONNECTED_SERVER = 0x8;
 
-    static final String COLOUR_CHANGE_EVENT = "whoop";
-    static final String UNKNOWN_EVENT = "gah!";
-    static final String QUERY_COLOUR_EVENT = "whatis?!";
-
     private ListView deviceList;
     private Vector<BluetoothDevice> pairedDevices;
     private ArrayAdapter<String> BTArrayAdapter;
-
-    protected Button button_red;
-    protected Button button_green;
-    protected Button button_blue;
-    protected Button button_yellow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /* wherein we instantiate a message handler */
-        uiHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                Bundle b = msg.getData();
-                Log.i(TAG, "Message: " + b.getString("key"));
-                if (b.containsKey(COLOUR_CHANGE_EVENT)) {
-                    setBackground(b.getInt(COLOUR_CHANGE_EVENT));
-                }
-                if (b.containsKey(QUERY_COLOUR_EVENT)) {
-                    pushBackground();
-                }
-                if (serverThread != null) {
-                    pushBackground();
-                }
-            }
-        };
 
         button_start_server = (Button) findViewById(R.id.button_start_server);
         button_start_server.setOnClickListener(new View.OnClickListener() {
@@ -108,32 +74,6 @@ public class MainActivity extends ActionBarActivity {
                 //make a thing happen
                 Intent intent_make_discoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
                 startActivityForResult(intent_make_discoverable, MAKE_DISCOVERABLE_REQUEST);
-            }
-        });
-
-        button_red = (Button) findViewById(R.id.button_red);
-        button_green = (Button) findViewById(R.id.button_green);
-        button_blue = (Button) findViewById(R.id.button_blue);
-        button_yellow = (Button) findViewById(R.id.button_yellow);
-
-        button_red.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setBackgroundRed();
-            }
-        });
-        button_green.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setBackgroundGreen();
-            }
-        });
-        button_blue.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setBackgroundBlue();
-            }
-        });
-        button_yellow.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setBackgroundYellow();
             }
         });
 
@@ -286,12 +226,6 @@ public class MainActivity extends ActionBarActivity {
         this.unregisterReceiver(bluetoothReceiver);
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        setBackground(currentBackground);
-    }
-
     private void updateBluetoothToggle() {
         if (ourBluetoothAdapter.isEnabled()) {
             updateBluetoothToggle(BluetoothAdapter.STATE_ON);
@@ -315,56 +249,6 @@ public class MainActivity extends ActionBarActivity {
                 enableBluetoothButtons(true);
                 break;
         }
-    }
-
-    protected void setBackground(int bg) {
-        currentBackground = bg;
-        View main_view = findViewById(R.id.main_layout);
-        switch (bg) {
-            case BACKGROUND_BLUE:
-                main_view.setBackgroundColor(getResources().getColor(R.color.background_blue));
-                break;
-            case BACKGROUND_YELLOW:
-                main_view.setBackgroundColor(getResources().getColor(R.color.background_yellow));
-                break;
-            case BACKGROUND_RED:
-                main_view.setBackgroundColor(getResources().getColor(R.color.background_red));
-                break;
-            case BACKGROUND_GREEN:
-                main_view.setBackgroundColor(getResources().getColor(R.color.background_green));
-                break;
-            default:
-                main_view.setBackgroundColor(Color.parseColor("#FFFAFA"));
-        }
-    }
-
-    private void pushBackground() {
-        if (clientThread != null) {
-            clientThread.write(CommandBytes.commandColourChange(currentBackground));
-        }
-        if (serverThread != null) {
-            serverThread.writeAll(CommandBytes.commandColourChange(currentBackground));
-        }
-    }
-
-    protected void setBackgroundRed() {
-        setBackground(BACKGROUND_RED);
-        pushBackground();
-    }
-
-    protected void setBackgroundGreen() {
-        setBackground(BACKGROUND_GREEN);
-        pushBackground();
-    }
-
-    protected void setBackgroundBlue() {
-        setBackground(BACKGROUND_BLUE);
-        pushBackground();
-    }
-
-    protected void setBackgroundYellow() {
-        setBackground(BACKGROUND_YELLOW);
-        pushBackground();
     }
 
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
@@ -440,7 +324,7 @@ public class MainActivity extends ActionBarActivity {
     private void enableBluetoothButtons(boolean enabled) {
         button_start_server.setEnabled(enabled);
         button_search_for_devices.setEnabled(enabled);
-    };
+    }
 
     private void clearCurrentThreads() {
 

@@ -65,40 +65,4 @@
             </ListView>
 
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
-        android:minHeight="30dp"
-        android:orientation="horizontal"
-        android:weightSum="3" >
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="0.75"
-            android:layout_height="match_parent"
-            android:text="@string/button_red"
-            android:id="@+id/button_red" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="0.75"
-            android:layout_height="match_parent"
-            android:text="@string/button_green"
-            android:id="@+id/button_green" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="0.75"
-            android:layout_height="match_parent"
-            android:text="@string/button_blue"
-            android:id="@+id/button_blue" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="0.75"
-            android:layout_height="match_parent"
-            android:text="@string/button_yellow"
-            android:id="@+id/button_yellow" />
-    </LinearLayout>
 </LinearLayout>

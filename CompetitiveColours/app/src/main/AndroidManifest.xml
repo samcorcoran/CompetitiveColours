@@ -24,6 +24,12 @@
             android:name="uk.wycor.competitivecolours.app.HostActivity"
             android:label="@string/title_activity_host" >
         </activity>
+        <activity
+            android:name="uk.wycor.competitivecolours.app.GameActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_game"
+            android:theme="@style/FullscreenTheme" >
+        </activity>
     </application>
 
 </manifest>
