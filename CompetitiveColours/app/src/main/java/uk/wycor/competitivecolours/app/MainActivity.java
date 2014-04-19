@@ -261,8 +261,6 @@ public class MainActivity extends ActionBarActivity {
 
                 connectivityState = CONNECTIVITY_LISTENING;
                 beginServerListening(ourBluetoothAdapter);
-
-                optionsDialog.dismiss();
             }
         }
         else if (requestCode == REQUEST_ENABLE_BT) {
@@ -495,6 +493,8 @@ public class MainActivity extends ActionBarActivity {
 
         clientThread = new ClientThread(bluetoothSocket, uiHandler);
         clientThread.start();
+
+        hideOptions();
     }
 
     private void beginServerListening(BluetoothAdapter bluetoothAdapter) {
@@ -508,9 +508,17 @@ public class MainActivity extends ActionBarActivity {
 
         serverThread = new ServerThread(bluetoothServerSocket, uiHandler);
         serverThread.start();
+
+        hideOptions();
     }
 
     private void displayOptions() {
         optionsDialog.show();
+    }
+
+    private void hideOptions() {
+        if (optionsDialog.isShowing()) {
+            optionsDialog.dismiss();
+        }
     }
 }
