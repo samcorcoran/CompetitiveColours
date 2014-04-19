@@ -14,4 +14,8 @@
     <string name="button_green">GREEN</string>
     <string name="button_blue">BLUE!</string>
     <string name="button_yellow">yellow...</string>
+    <string name="title_activity_host">HostActivity</string>
+
+    <string name="game_start">START!</string>
+
 </resources>
