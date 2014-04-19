@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.bluetooth.*;
 import android.view.View;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -50,6 +51,7 @@ public class MainActivity extends ActionBarActivity {
     private ToggleButton toggle_bluetooth_enabled;
     private Button button_start_server;
     private Button button_search_for_devices;
+    private Button button_start_game;
 
     private CountDownTimer countdownSinceSearch;
     private boolean countdownInProgress;
@@ -75,10 +77,15 @@ public class MainActivity extends ActionBarActivity {
     static final String QUERY_COLOUR_EVENT = "whatis?!";
     static final String CONNECTIVITY_STATUS = "statum";
     static final String DEVICE_NAME = "whom";
+    static final String NEW_CLIENT_NAME = "welcome, friend";
+    static final String NEW_CLIENT_ADDRESS = "beep boop";
 
     private ListView deviceList;
     private Vector<BluetoothDevice> pairedDevices;
     private ArrayAdapter<String> BTArrayAdapter;
+
+    private ListView clientList;
+    private ArrayAdapter<String> clientListAdapter;
 
     protected Button button_red;
     protected Button button_green;
@@ -86,6 +93,7 @@ public class MainActivity extends ActionBarActivity {
     protected Button button_yellow;
 
     private Dialog optionsDialog;
+    private Dialog hostDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +118,10 @@ public class MainActivity extends ActionBarActivity {
                 if (b.containsKey(CONNECTIVITY_STATUS)) {
                     connectivityState = b.getInt(CONNECTIVITY_STATUS);
                 }
+                if (b.containsKey(NEW_CLIENT_ADDRESS) && b.containsKey(NEW_CLIENT_NAME)) {
+
+                    clientListAdapter.add(b.getString(NEW_CLIENT_NAME) + String.format("%n") + b.getString(NEW_CLIENT_ADDRESS));
+                }
                 if (serverThread != null) {
                     // Update backgrounds of clients
                     pushBackground();
@@ -120,7 +132,6 @@ public class MainActivity extends ActionBarActivity {
 
         optionsDialog = new Dialog(this, R.style.TitlelessDialog);
         optionsDialog.setContentView(R.layout.dialog_options);
-        optionsDialog.setTitle("Game setup");
 
         optionsDialog.setOnDismissListener(new Dialog.OnDismissListener() {
             @Override
@@ -128,6 +139,38 @@ public class MainActivity extends ActionBarActivity {
                 if (!isInGame()) {
                     displayOptions();
                 }
+            }
+        });
+
+
+        hostDialog = new Dialog(this, R.style.TitlelessDialog);
+        hostDialog.setContentView(R.layout.dialog_host);
+
+        clientList = (ListView) hostDialog.findViewById(R.id.client_list);
+        clientListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        clientList.setAdapter(clientListAdapter);
+
+        hostDialog.setOnDismissListener(new Dialog.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dli) {
+                //nothing
+            }
+        });
+
+        hostDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                clientListAdapter.clear();
+            }
+        });
+
+
+        button_start_game = (Button) hostDialog.findViewById(R.id.button_start_game);
+        button_start_game.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hostDialog.dismiss();
+                serverThread.ceaseCreatingExtraVillagers();
             }
         });
 
@@ -519,17 +562,33 @@ public class MainActivity extends ActionBarActivity {
         serverThread.start();
 
         hideOptions();
+        displayHostDialog();
     }
 
     private void displayOptions() {
-        optionsDialog.show();
+        if (!optionsDialog.isShowing()) {
+            optionsDialog.show();
+        }
     }
 
     private void hideOptions() {
         if (optionsDialog.isShowing()) {
             optionsDialog.dismiss();
         }
-    } 
+    }
+
+    private void displayHostDialog() {
+        if (!hostDialog.isShowing()) {
+            hostDialog.show();
+        }
+    }
+
+    private void hideHostDialog() {
+        if (hostDialog.isShowing()) {
+            hostDialog.dismiss();
+        }
+    }
+
     private boolean isInGame() {
         return (serverThread != null) || (clientThread != null);
     }

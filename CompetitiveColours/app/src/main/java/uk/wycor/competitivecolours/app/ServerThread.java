@@ -18,6 +18,8 @@ public class ServerThread extends Thread {
     private final BluetoothServerSocket serverSocket;
     private final Handler handler;
 
+    private boolean createExtraVillagers = true;
+
     private HashMap<BluetoothDevice, ConnectedThread> serverThreads;
 
     public ServerThread(BluetoothServerSocket bss, Handler h) {
@@ -34,7 +36,7 @@ public class ServerThread extends Thread {
         b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_LISTENING);
         handler.sendMessage(m);
 
-        while (true) {
+        while (createExtraVillagers) {
             try {
                 socket = serverSocket.accept();
             } catch (IOException e) {
@@ -51,6 +53,10 @@ public class ServerThread extends Thread {
         }
     }
 
+    public void ceaseCreatingExtraVillagers() {
+        this.createExtraVillagers = false;
+    }
+
     public void cancel() {
         try {
             serverSocket.close();
@@ -64,6 +70,11 @@ public class ServerThread extends Thread {
     }
 
     private void forkCommunicationThread(BluetoothSocket bts, Handler h) {
+        Message m = handler.obtainMessage();
+        Bundle b = m.getData();
+        b.putString(MainActivity.NEW_CLIENT_NAME, bts.getRemoteDevice().getName());
+        b.putString(MainActivity.NEW_CLIENT_ADDRESS, bts.getRemoteDevice().getAddress());
+        handler.sendMessage(m);
         serverThreads.put(bts.getRemoteDevice(), new ConnectedThread(bts, h, false));
         serverThreads.get(bts.getRemoteDevice()).start();
     }
