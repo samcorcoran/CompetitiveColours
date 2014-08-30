@@ -9,14 +9,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="0dp"
-        android:weightSum="10">
+        android:weightSum="10.5">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:text="@string/player_name"
+            android:ems="10"
+            android:id="@+id/player_name"
+            android:layout_weight="0.5" />
 
         <ToggleButton
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1.5"
             android:layout_gravity="center_horizontal|top"
-            android:layout_marginTop="30dp"
             android:checked="false"
             android:textOn="@string/toggle_bluetooth_on"
             android:textOff="@string/toggle_bluetooth_off"

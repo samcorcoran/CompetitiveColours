@@ -9,6 +9,7 @@ import android.os.Message;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Vector;
 
 /**
  * Created by WillW on 18/04/14.
@@ -20,12 +21,15 @@ public class ServerThread extends Thread {
 
     private boolean createExtraVillagers = true;
 
+    private Vector<Player> players;
+
     private HashMap<BluetoothDevice, ConnectedThread> serverThreads;
 
     public ServerThread(BluetoothServerSocket bss, Handler h) {
         handler = h;
         serverSocket = bss;
         serverThreads = new HashMap<BluetoothDevice, ConnectedThread>();
+        players = new Vector<Player>();
     }
 
     public void run() {
@@ -57,6 +61,15 @@ public class ServerThread extends Thread {
         this.createExtraVillagers = false;
     }
 
+    public boolean addPlayer(Player player) {
+        if (players.size() < 4) {
+            players.add(player);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
     public void cancel() {
         try {
             serverSocket.close();
@@ -70,11 +83,6 @@ public class ServerThread extends Thread {
     }
 
     private void forkCommunicationThread(BluetoothSocket bts, Handler h) {
-        Message m = handler.obtainMessage();
-        Bundle b = m.getData();
-        b.putString(MainActivity.NEW_CLIENT_NAME, bts.getRemoteDevice().getName());
-        b.putString(MainActivity.NEW_CLIENT_ADDRESS, bts.getRemoteDevice().getAddress());
-        handler.sendMessage(m);
         serverThreads.put(bts.getRemoteDevice(), new ConnectedThread(bts, h, false));
         serverThreads.get(bts.getRemoteDevice()).start();
     }

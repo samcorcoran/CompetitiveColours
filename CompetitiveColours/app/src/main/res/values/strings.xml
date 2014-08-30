@@ -18,7 +18,7 @@
     <string name="button_start_game">LAUNCH!</string>
     <string name="client_list_title">Connected players...</string>
     <string name="select_game_type">Select game type...</string>
-    <string name="select_game_duration">Select game length...</string>
+    <string name="select_game_duration">Select game length...</string><string name="player_name">Player name...</string>
     <string-array name="game_type_list">
         <item>Simon</item>
         <item>King of the Hue</item>

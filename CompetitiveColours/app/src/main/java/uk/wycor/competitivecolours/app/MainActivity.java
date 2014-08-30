@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
@@ -23,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.bluetooth.*;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +37,9 @@ import java.util.Vector;
 public class MainActivity extends ActionBarActivity {
 
     public static final UUID CCUUID = UUID.fromString("30d9ff20-e01d-be4f-7183-55a0c0e01c40");
+    private final String SETTING_PLAYER_NAME = "player_name";
+
+    private SharedPreferences settings;
 
     static final int MAKE_DISCOVERABLE_REQUEST = 1;
     static final int REQUEST_ENABLE_BT = 2;
@@ -76,9 +81,9 @@ public class MainActivity extends ActionBarActivity {
     static final String UNKNOWN_EVENT = "gah!";
     static final String QUERY_COLOUR_EVENT = "whatis?!";
     static final String CONNECTIVITY_STATUS = "statum";
-    static final String DEVICE_NAME = "whom";
-    static final String NEW_CLIENT_NAME = "welcome, friend";
-    static final String NEW_CLIENT_ADDRESS = "beep boop";
+    static final String REMOTE_DEVICE_NAME = "whom";
+    static final String CONNECTED_AS_CLIENT_EVENT = "another guest has arrived";
+    static final String PLAYER_JOINED_EVENT = "have a seat while we wait for the others";
 
     private ListView deviceList;
     private Vector<BluetoothDevice> pairedDevices;
@@ -92,6 +97,8 @@ public class MainActivity extends ActionBarActivity {
     protected Button button_blue;
     protected Button button_yellow;
 
+    private EditText playerName;
+
     private Dialog optionsDialog;
     private Dialog hostDialog;
 
@@ -99,6 +106,10 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        settings = getPreferences(Context.MODE_PRIVATE);
+
+        gameLog = new GameLog();
 
         /* wherein we instantiate a message handler */
         uiHandler = new Handler() {
@@ -108,8 +119,8 @@ public class MainActivity extends ActionBarActivity {
                 if (b.containsKey(COLOUR_CHANGE_EVENT)) {
                     setBackground(b.getInt(COLOUR_CHANGE_EVENT));
                     // Server logs colour change for scoring
-                    if (serverThread != null && b.containsKey(DEVICE_NAME)) {
-                        gameLog.logNewAction(b.getInt(COLOUR_CHANGE_EVENT), b.getString(DEVICE_NAME));
+                    if (serverThread != null && b.containsKey(REMOTE_DEVICE_NAME)) {
+                        gameLog.logNewAction(b.getInt(COLOUR_CHANGE_EVENT), b.getString(REMOTE_DEVICE_NAME));
                     }
                 }
                 if (b.containsKey(QUERY_COLOUR_EVENT)) {
@@ -118,9 +129,24 @@ public class MainActivity extends ActionBarActivity {
                 if (b.containsKey(CONNECTIVITY_STATUS)) {
                     connectivityState = b.getInt(CONNECTIVITY_STATUS);
                 }
-                if (b.containsKey(NEW_CLIENT_ADDRESS) && b.containsKey(NEW_CLIENT_NAME)) {
-
-                    clientListAdapter.add(b.getString(NEW_CLIENT_NAME) + String.format("%n") + b.getString(NEW_CLIENT_ADDRESS));
+                if (b.containsKey(CONNECTED_AS_CLIENT_EVENT) && clientThread != null) {
+                    // "join" game with player name
+                    Log.d("CONNECTIVITY", "we as a client have connected to ye as a server");
+                    String playerName = settings.getString(SETTING_PLAYER_NAME, "Player");
+                    clientThread.write(CommandBytes.commandJoinGame(playerName));
+                }
+                if (b.containsKey(PLAYER_JOINED_EVENT) && serverThread != null) {
+                    BluetoothDevice btd = null;
+                    try {
+                        btd = (BluetoothDevice) msg.obj;
+                    } catch (ClassCastException e) {
+                        // fuck knows, nothing I guess
+                    }
+                    if (btd != null) {
+                        Player newPlayer = new Player(btd, b.getString(PLAYER_JOINED_EVENT));
+                        serverThread.addPlayer(newPlayer);
+                        clientListAdapter.add(newPlayer.getPlayerName() + String.format("%n") + newPlayer.getBluetoothDevice().getAddress().toString());
+                    }
                 }
                 if (serverThread != null) {
                     // Update backgrounds of clients
@@ -236,20 +262,20 @@ public class MainActivity extends ActionBarActivity {
             button_search_for_devices = (Button) optionsDialog.findViewById(R.id.button_search_for_devices);
             button_search_for_devices.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    // Reset flag that inhibits 'search ended' toasts
-                    connectingToGame = false;
+                // Reset flag that inhibits 'search ended' toasts
+                connectingToGame = false;
 
-                    clearCurrentThreads();
-                    if (ourBluetoothAdapter.isDiscovering()) {
-                        ourBluetoothAdapter.cancelDiscovery();
-                        Toast.makeText(getApplicationContext(), "Search for devices cancelled", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Searching for devices...", Toast.LENGTH_LONG).show();
-                        BTArrayAdapter.clear();
-                        pairedDevices.clear();
-                        BTArrayAdapter.notifyDataSetChanged();
-                        ourBluetoothAdapter.startDiscovery();
-                    }
+                clearCurrentThreads();
+                if (ourBluetoothAdapter.isDiscovering()) {
+                    ourBluetoothAdapter.cancelDiscovery();
+                    Toast.makeText(getApplicationContext(), "Search for devices cancelled", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Searching for devices...", Toast.LENGTH_LONG).show();
+                    BTArrayAdapter.clear();
+                    pairedDevices.clear();
+                    BTArrayAdapter.notifyDataSetChanged();
+                    ourBluetoothAdapter.startDiscovery();
+                }
                 }
             });
 
@@ -257,17 +283,17 @@ public class MainActivity extends ActionBarActivity {
             toggle_bluetooth_enabled = (ToggleButton) optionsDialog.findViewById(R.id.toggle_bluetooth_enabled);
             toggle_bluetooth_enabled.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
-                    // Is the toggle on?
-                    boolean isChecked = ((ToggleButton) view).isChecked();
-                    if (isChecked) {
-                        // The toggle is enabled
-                        Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                        startActivityForResult(turnOnIntent, REQUEST_ENABLE_BT);
-                    } else {
-                        // The toggle is disabled
-                        ourBluetoothAdapter.disable();
-                        Toast.makeText(getApplicationContext(), "Bluetooth turned off", Toast.LENGTH_SHORT).show();
-                    }
+                // Is the toggle on?
+                boolean isChecked = ((ToggleButton) view).isChecked();
+                if (isChecked) {
+                    // The toggle is enabled
+                    Intent turnOnIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(turnOnIntent, REQUEST_ENABLE_BT);
+                } else {
+                    // The toggle is disabled
+                    ourBluetoothAdapter.disable();
+                    Toast.makeText(getApplicationContext(), "Bluetooth turned off", Toast.LENGTH_SHORT).show();
+                }
                 }
             });
             updateBluetoothToggle();
@@ -295,6 +321,12 @@ public class MainActivity extends ActionBarActivity {
                 beginClientConnection(chosenDevice);
             }
         });
+
+        playerName = (EditText) optionsDialog.findViewById(R.id.player_name);
+
+        if (settings.contains(SETTING_PLAYER_NAME)) {
+            playerName.setText(settings.getString(SETTING_PLAYER_NAME, "Player"));
+        }
 
         displayOptions();
     }
@@ -351,7 +383,7 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.action_settings:
-                Toast.makeText(getApplicationContext(), "THERE ARE NO CONFIGURABLE SETTINGS", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(), "THERE ARE NO CONFIGURABLE SETTINGS", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_restart:
                 if (!optionsDialog.isShowing()) {
@@ -572,6 +604,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void hideOptions() {
+
+        SharedPreferences.Editor settingsEditor = settings.edit();
+        settingsEditor.putString(SETTING_PLAYER_NAME, playerName.getText().toString());
+        settingsEditor.commit();
+
         if (optionsDialog.isShowing()) {
             optionsDialog.dismiss();
         }
@@ -591,5 +628,9 @@ public class MainActivity extends ActionBarActivity {
 
     private boolean isInGame() {
         return (serverThread != null) || (clientThread != null);
+    }
+
+    void applyPlayerName() {
+
     }
 }

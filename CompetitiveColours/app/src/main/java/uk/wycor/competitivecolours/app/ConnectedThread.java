@@ -10,13 +10,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by WillW on 18/04/14.
  */
 public class ConnectedThread extends Thread {
 
-    private static final int MESSAGE_READ = 1234; //not sure what this thing is
+    //private static final int MESSAGE_READ = 1234; //not sure what this thing is
     private final BluetoothSocket bluetoothSocket;
     private final Handler handler;
     private final InputStream inputStream;
@@ -49,7 +51,7 @@ public class ConnectedThread extends Thread {
         } else {
             b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_SERVER);
         }
-        b.putString(MainActivity.DEVICE_NAME, bts.getRemoteDevice().getName());
+        b.putString(MainActivity.REMOTE_DEVICE_NAME, bts.getRemoteDevice().getName());
         handler.sendMessage(m);
     }
 
@@ -57,6 +59,14 @@ public class ConnectedThread extends Thread {
         byte[] buffer; // = new byte[1024];  // buffer store for the stream
         byte[] dataLength = new byte[1];
         int bytes; // bytes returned from read()
+
+        if (isClient) {
+            Message connectedMessage = handler.obtainMessage();
+            Bundle connectedMessageData = connectedMessage.getData();
+            connectedMessageData.putBoolean(MainActivity.CONNECTED_AS_CLIENT_EVENT, true);
+            handler.sendMessage(connectedMessage);
+        }
+
         while (true) {
             try {
                 bytes = inputStream.read(dataLength); //read 1 byte to determine length of next chunk of datas
@@ -67,17 +77,21 @@ public class ConnectedThread extends Thread {
 
                 Message m = handler.obtainMessage();
                 Bundle b = m.getData();
-                if (isClient) {
-                    b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_CLIENT);
-                } else {
-                    b.putInt(MainActivity.CONNECTIVITY_STATUS, MainActivity.CONNECTIVITY_CONNECTED_SERVER);
-                }
 
                 switch (command) { //what command did it give us?!
                     case CommandBytes.COMMAND_COLOUR_CHANGE:
                         int newBackground = (int)buffer[1];
                         b.putInt(MainActivity.COLOUR_CHANGE_EVENT, newBackground);
                         break;
+                    case CommandBytes.COMMAND_JOIN_NAME:
+                        if (isClient) {
+                            // do nothing
+                        } else {
+                            //StandardCharsets.UTF_8.name() == "UTF-8"
+                            String playerName = new String(buffer, Charset.forName("UTF-8"));
+                            b.putString(MainActivity.PLAYER_JOINED_EVENT, playerName);
+                            m.obj = bluetoothSocket.getRemoteDevice();
+                        }
                     default:
                         b.putByteArray(MainActivity.UNKNOWN_EVENT, buffer);
                 }
